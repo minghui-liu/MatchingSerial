@@ -53,8 +53,10 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 		}
 	}
 
+	// tranpose G2
 	float *G2t = transpose(G2, size2, size2);
-
+	
+	// creat Y and make it an all zero matrix
 	float Y[size1][size2];
 	zeros(Y, size1, size2);
 
