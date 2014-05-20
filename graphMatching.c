@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "utils.c"
 
-int main(void){
-
-	
+int main(void) {
 	return 0;
 }
 
