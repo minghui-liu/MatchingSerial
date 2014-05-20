@@ -14,8 +14,8 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
  	'Probabilistic Graph and Hypergraph Matching.',
  	Computer Vision and Pattern Recognition (CVPR) Anchorage, Alaska, June 2008.
 
- 	G1  				An n1 by n1 symmetric matrix, with the weight of the first graph edges.
- 	G2  				An n2 by n2 symmetric matrix, with the weight of the second graph edges.
+ 	G1  				An size1 by size1 symmetric matrix, with the weight of the first graph edges.
+ 	G2  				An size2 by size2 symmetric matrix, with the weight of the second graph edges.
  	sigma 	 			Kernel parameter for edge-to-edge correlations.
  	numberOfMatches  	number of matches required. 
 
@@ -30,9 +30,8 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 	Y [Output]  	Debug information.
 */
 
-// size1 and size2 are the dimensions of G1 and G2
 
-//Check to make sure the matrices are symmetric	
+	//Check to make sure the matrices are symmetric	
 	float diff;
 	for(int i=0; i < size1; i++){
 		for(int j=0; j < size1; j++){
@@ -54,19 +53,9 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 		}
 	}
 
-	float G2t[size2][size2];
-	for(int i=0; i<size2; i++){
-		for(int j=0; j<size2; j++){
-			G2t[i][j] = *(G2 + sizeof(float)*j*size2 + sizeof(float)*i);
-		}
-	}
+	float *G2t = transpose(G2, size2, size2);
 
 	float Y[size1][size2];
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-			Y[i][j] = 0;
-		}
-	}
-
+	zeros(Y, size1, size2);
 
 }
