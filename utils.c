@@ -27,9 +27,20 @@ float* transpose(float *in_matrix, int size1, int size2) {
 void zeros(float *Y, int size1, int size2){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*size1*sizeof(float) + (j*sizeof(float)*size2))) = 0;
+			*(Y + (i*sizeof(float)*size2 + j*sizeof(float)) ) = 0;
 		}
 	}
+}
+
+/* create an all zero matrix of size1*size2 */
+float* zeros(int size1, size2) {
+	float out_matrix[size1][size2];
+	for(int i=0; i<size1; i++){
+		for(int j=0; j<size2; j++){
+			*(out_matrix + (i*size2*sizeof(float) + j*sizeof(float)) ) = 0;
+		}
+	}
+	return &out_matrix;
 }
 
 /* make Y an all one matrix
@@ -38,9 +49,20 @@ void zeros(float *Y, int size1, int size2){
 void ones(float *Y, int size1, int size2){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*size1*sizeof(float) + (j*sizeof(float)*size2))) = 1;
+			*(Y + (i*size2*sizeof(float) + j*sizeof(float)) ) = 1;
 		}
 	}
+}
+
+/* create an all zeroe matrix of size1*size2 */
+float* ones(int size1, int size2) {
+	float out_matrix[size1][size2];
+	for(int i=0; i<size1; i++){
+		for(int j=0; j<size2; j++){
+			*(out_matrix + (i*size2*sizeof(float) + j*sizeof(float)) ) = 1;
+		}
+	}
+	return &out_matrix;
 }
 
 /* check if a square matrix is symmetric
