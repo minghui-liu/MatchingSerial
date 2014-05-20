@@ -32,26 +32,19 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 
 
 	//Check to make sure the matrices are symmetric	
-	float diff;
-	for(int i=0; i < size1; i++){
-		for(int j=0; j < size1; j++){
-			diff = *(G1 + sizeof(float)*i*size1 + sizeof(float)*j) - *(G1 + sizeof(float)*j*size1 + sizeof(float)*i);
-			if(diff > 1e-6){
-				System.out.print("G1 is not symmetric\n");
-				return;
-			}
-		}
-	}
 
-	for(int i=0; i < size2; i++){
-		for(int j=0; j < size2; j++){
-			diff = *(G2 + sizeof(float)*i*size2 + sizeof(float)*j) - *(G2 + sizeof(float)*j*size2 + sizeof(float)*i);
-			if(diff > 1e-6){
-				System.out.print("G2 is not symmetric\n");
-				return;
-			}
-		}
+	int check;
+
+	check = isSymmetric(G1, size1);
+	if(check == 0){
+		System.out.print("G1 is not symmetric \n");
 	}
+	
+	check = isSymmetric(G2, size2);
+	if(check == 0){
+		System.out.print("G2 is not symmetric \n");
+	}
+	
 
 	// tranpose G2
 	float *G2t = transpose(G2, size2, size2);
