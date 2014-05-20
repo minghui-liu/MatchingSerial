@@ -30,6 +30,7 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
  
 	Y [Output]  	Debug information.
 */
+
 // size1 and size2 are the dimensions of G1 and G2
 
 //Check to make sure the matrices are symmetric	
