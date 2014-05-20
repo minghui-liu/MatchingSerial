@@ -3,6 +3,7 @@
  * Utility functions for serial hypergraph matching
  *
  * Reid Delaney & Kevin Liu
+ * test if Reid has access
  */
 
 #include <stdio.h>
