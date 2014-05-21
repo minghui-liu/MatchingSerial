@@ -98,6 +98,46 @@ void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim
 	}
 }
 
+/* Perform matrix addtion and return the sum of two matrices 
+ * in_matrix1 in_matrix2: input matrices
+ * sum: output matrix
+ * dim1 dim2: the dimension of the matrices 
+ */
+void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2){
+	for(int i=0; i < dim1; i++){
+		for(int j=0; j < dim2; j++){
+			*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) + *(in_matrix2 + i * dim2 + j);
+		}
+	}
+}
+
+/* Perform matrix and scaler addtion and return the sum 
+ * in_matrix1: input matrix
+ * scaler: input scaler
+ * sum: output matrix
+ * dim1 dim2: the dimension of the matrix 
+ */
+void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim2){
+	for(int i=0; i < dim1; i++){
+		for(int j=0; j < dim2; j++){
+			*(sum + i * dim2 + j) = *(in_matrix + i * dim2 + j) + scaler;
+		}
+	}
+}
+
+/* Perform element wise matrix division
+ * in_matrix1 in_matrix2: input matrices
+ * out: output matrix
+ * dim1 dim2: the dimension of the matrices 
+ */
+void matDiv(float *in_matrix1, float *in_matrix2, float* out, int dim1, int dim2){
+	for(int i=0; i < dim1; i++){
+		for(int j=0; j < dim2; j++){
+			*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) / *(in_matrix2 + i * dim2 + j);
+		}
+	}
+}
+
 /* find the maximum element in an array */
 float maxOfArray(float *array, int size) {
 	float m = array[0];
