@@ -11,11 +11,10 @@
 /* transpose a size1*size2 matrix
  * returns a pointer to the new matrix
  */
-float* transpose(float *in_matrix, int size1, int size2) {
-	float out_matrix[size2][size1];
+void transpose(float *in_matrix, float *out_matrix, int size1, int size2) {
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			out_matrix[j][i] = *(matrix + sizeof(float)*i*size2 + sizeof(float)*j);
+			*(out_matrix + j*size1 + i) = *(in_matrix + i*size2 + j);
 		}
 	}
 	return &out_matrix;
@@ -27,20 +26,9 @@ float* transpose(float *in_matrix, int size1, int size2) {
 void zeros(float *Y, int size1, int size2){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*sizeof(float)*size2 + j*sizeof(float)) ) = 0;
+			*(Y + (i*size2 + j) ) = 0;
 		}
 	}
-}
-
-/* create an all zero matrix of size1*size2 */
-float* zeros(int size1, size2) {
-	float out_matrix[size1][size2];
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-			*(out_matrix + (i*size2*sizeof(float) + j*sizeof(float)) ) = 0;
-		}
-	}
-	return &out_matrix;
 }
 
 /* make Y an all one matrix
@@ -49,20 +37,9 @@ float* zeros(int size1, size2) {
 void ones(float *Y, int size1, int size2){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*size2*sizeof(float) + j*sizeof(float)) ) = 1;
+			*(Y + (i*size2 + j) ) = 1;
 		}
 	}
-}
-
-/* create an all zeroe matrix of size1*size2 */
-float* ones(int size1, int size2) {
-	float out_matrix[size1][size2];
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-			*(out_matrix + (i*size2*sizeof(float) + j*sizeof(float)) ) = 1;
-		}
-	}
-	return &out_matrix;
 }
 
 /* check if a square matrix is symmetric
@@ -70,9 +47,10 @@ float* ones(int size1, int size2) {
  * returns 1 if true, 0 if false
  */
 int isSymmetric(float *in_matrix, int size){
+	double diff;
 	for(int i=0; i < size; i++){
 		for(int j=0; j < size; j++){
-			diff = *(in_matrix + sizeof(float)*i*size + sizeof(float)*j) - *(in_matrix + sizeof(float)*j*size + sizeof(float)*i);
+			diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
 			if(diff != 0){
 				return 0;
 			}
@@ -86,10 +64,11 @@ int isSymmetric(float *in_matrix, int size){
  * eps: the epsilon value
  * returns 1 if true 0 if false
  */
-int isSymmetric(double *in_matrix, int size, double eps) {
+int isSymmetric(float *in_matrix, int size, double eps) {
+	double diff;
 	for(int i=0; i < size; i++){
 		for(int j=0; j < size; j++){
-			diff = *(in_matrix + sizeof(float)*i*size + sizeof(float)*j) - *(in_matrix + sizeof(float)*j*size + sizeof(float)*i);
+			diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
 			if(diff > eps || diff < -eps){
 				return 0;
 			}
@@ -98,3 +77,13 @@ int isSymmetric(double *in_matrix, int size, double eps) {
 	return 1;
 }
 
+/* creates a m*n tiling of a matrix */
+void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, int n) {
+	for(int i=0; i<size1*m; i++) {
+		for(int j=0; j<size2*n; j++) {
+			*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
+		}
+	}
+}
+
+/* find the maximum 
