@@ -3,10 +3,6 @@
 #include <time.h>
 #include <math.h>
 
-int main(){
-	return 0;
-}
-
 /*
 function F = nearestDSmax_RE (Y, maxRowSum, maxColSum, totalSum, precision, maxLoops)
 
@@ -26,7 +22,8 @@ maxLoops [Optional, defalut=1000] - Max number of iterations to perform.
 
 F [Output] - The nearest generalized doubly stochastic F to Ker in relative entropy.
 
-Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass */
+Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass 
+*/
 
 void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum, float totalSum, float precision, float maxLoops){
 //m and n are the dimensions of Y
@@ -52,7 +49,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 	float F2[m][n];
 	float F3[m][n];
 
-//sum(Y(:))
+	//sum(Y(:))
 	float Ysum = 0;
 	for(int i=0; i < m; i++){
 		for(int j=0; j < n; j++){
@@ -71,51 +68,54 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 	float H2[m][n];
 	float H3[m][n];
 
-//for t = 1 : maxLoops
-	for(int t=0; t < maxLoops; t++){
+	//for t = 1 : maxLoops
+	for(int t=0; t < maxLoops; t++) {
+ 		// Max row sum 
+		// H1 = lambda1 - (Y ./ (F3+eps));
+		float F3eps[m][n];
+		matPlusScaler(F3, eps, F3eps, m, n);
+		float Ydiv[m][n]; 
+		matDiv(Y, F3eps, Ydiv, m, n)
+		matSub(lambda1, Ydiv, H1, m, n);
+		
+		// (Y ./ (F3 + eps))
 
-/* 	Max row sum:
- * 		H1 = lambda1 - (Y ./ (F3+eps));
- * 		F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
- * 		lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
- */
- 		matSub(H1, lambda1, Ysub, m, n);
+		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
+		
+		// lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
+		
  		transpose(maxColSumP())
-
 	}
 }
 
 void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float maxColSum, float precision, float* X){
-//function X = maxColSumP (Y, H, maxColSum, precision)
+	//function X = maxColSumP (Y, H, maxColSum, precision)
 
-//X = unconstrainedP (Y, H);
+	//X = unconstrainedP (Y, H);
 	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
 
-//Xsum = sum(X);
+	//Xsum = sum(X);
 	for(int i=0; i < Ydim1; i++){
 		for(int j=0; j < Ydim2; j++){
 			Xsum += *(X + i*Ydim2 + j);
 		}
 	}
 
-//for i = find(Xsum > maxColSum)
+	//for i = find(Xsum > maxColSum)
 	//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
 }
 
 void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float eps){
-//function X = unconstrainedP (Y, H)
-
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-
-//X = Y ./ H;
+	//function X = unconstrainedP (Y, H)
+	for(int i=0; i<size1; i++) {
+		for(int j=0; j<size2; j++) {
+			//X = Y ./ H;
 			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
 
-//X(find(X < eps)) = eps;
-			if(*(X + i*size2 + j) < eps){
+			//X(find(X < eps)) = eps;
+			if(*(X + i*size2 + j) < eps) {
 				*(X + i*size2 + j) = eps;
 			}
-
 		}
 	}
 }
