@@ -85,11 +85,15 @@ void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, in
 	}
 }
 
-/* Perform array subtraction and return the new array */
-void matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
+/* Perform matrix subtraction and return the difference between two matrices 
+ * in_matrix1 in_matrix2: input matrices
+ * diff: output matrix
+ * dim1 dim2: the dimension of the matrices 
+ */
+void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim2){
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(diff + i * dim1 + j) = *(op1 + i * dim1 + j) - *(op2 + i * dim1 + j);
+			*(diff + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) - *(in_matrix2 + i * dim2 + j);
 		}
 	}
 }
