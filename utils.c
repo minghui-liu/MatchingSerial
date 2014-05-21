@@ -17,7 +17,6 @@ void transpose(float *in_matrix, float *out_matrix, int size1, int size2) {
 			*(out_matrix + j*size1 + i) = *(in_matrix + i*size2 + j);
 		}
 	}
-	return &out_matrix;
 }
 
 /* make Y an all zero matrix
@@ -64,7 +63,7 @@ int isSymmetric(float *in_matrix, int size){
  * eps: the epsilon value
  * returns 1 if true 0 if false
  */
-int isSymmetric(float *in_matrix, int size, double eps) {
+int isSymmetric_eps(float *in_matrix, int size, double eps) {
 	double diff;
 	for(int i=0; i < size; i++){
 		for(int j=0; j < size; j++){
@@ -94,5 +93,37 @@ void matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
 		for(int j=0; j < dim2; j++){
 			*(diff + i * dim1 + j) = *(op1 + i * dim1 + j) - *(op2 + i * dim1 + j);
 		}
+	}
+}
+/* find the maximum element in an array */
+float maxOfArray(float *array, int size) {
+	float m = array[0];
+	for (int i=1; i<size; i++) {
+		m = max(m, array[i]);
+	}
+	return m;
+}
+
+/* find the maximum elements in a matrix
+ * dim: the dimension wrt which you want to find the maximums
+ * 
+ * Example:
+ * Consider the following matrix A:
+ * 	1 2 3
+ * 	4 5 6
+ * 	7 8 9
+ * maxOfMatrix(A,1) will return [7 8 9]
+ * maxOfMatrix(A,2) will return [3 6 9]                            
+ */
+void maxOfMatrix(float *matrix, int size1, int size2, float *out, int dim) {
+	if (dim == 1) {
+		for(int i=0; i<size2; i++) {
+			float m = *(matrix + i);
+			for (int j=0; j<size1; j++) {
+				m = max(m, *(matrix+j*size2+i));
+			}
+			*(out + i) = m;
+		}
+
 	}
 }
