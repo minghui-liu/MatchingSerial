@@ -85,8 +85,6 @@ void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, in
 	}
 }
 
-/* find the maximum */
-
 /* Perform array subtraction and return the new array */
 void matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
 	for(int i=0; i < dim1; i++){
@@ -95,11 +93,12 @@ void matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
 		}
 	}
 }
+
 /* find the maximum element in an array */
 float maxOfArray(float *array, int size) {
 	float m = array[0];
 	for (int i=1; i<size; i++) {
-		m = max(m, array[i]);
+		m = (m > array[i])? m : array[i];
 	}
 	return m;
 }
@@ -120,10 +119,32 @@ void maxOfMatrix(float *matrix, int size1, int size2, float *out, int dim) {
 		for(int i=0; i<size2; i++) {
 			float m = *(matrix + i);
 			for (int j=0; j<size1; j++) {
-				m = max(m, *(matrix+j*size2+i));
+				m = (m > *(matrix+j*size2+i))? m : *(matrix+j*size2+i);
 			}
-			*(out + i) = m;
+		*(out + i) = m;
 		}
-
+	} else if (dim = 2) {
+		for(int i=0; i<size1; i++) {
+			float m = *(matrix + i*size2);
+			for (int j=0; j<size2; j++) {
+				m = (m > *(matrix+i*size2+j))? m : *(matrix+i*size2+j);
+			}
+		*(out + i) = m;
+		}
 	}
 }
+
+/* prints a matrix 
+ * matrix: pointer to the matrix to be printed
+ * size1 size2: size of matrix
+ */
+void printMatrix(float *matrix, int size1, int size2) {
+	for (int i=0; i<size1; i++){
+		for(int j=0; j<size2; j++) {
+			printf("%.2f ", *(matrix + i*size2 + j));
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
