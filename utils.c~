@@ -89,7 +89,7 @@ void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, in
 /* find the maximum */
 
 /* Perform array subtraction and return the new array */
-void matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
+float* matSub(float* diff, float* op1, float* op2, int dim1, int dim2){
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			*(diff + i * dim1 + j) = *(op1 + i * dim1 + j) - *(op2 + i * dim1 + j);
