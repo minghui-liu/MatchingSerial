@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* File: hypergraphMatching.c
  *
  * Optimal soft hyergraph matching.
@@ -44,3 +45,4 @@ void soft2hard(float *soft, int size1, size2, float *hard, int numberOfMatches) 
 					
 	}
 }
+
