@@ -53,20 +53,25 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 	float Ysum = 0;
 	for(int i=0; i < m; i++){
 		for(int j=0; j < n; j++){
+
 			Ysum += *(Y + i*n + j);
+
 		}
 	}
 
 	for(int i=0; i < m; i++){
 		for(int j=0; j < n; j++){
+
 			F1[i][j] = totalSum * (*(Y + i*n + j) / Ysum);
 			F2[i][j] = F3[i][j] = F1[i][j];
+
 		}
 	}
 
 	float H1[m][n];
 	float H2[m][n];
 	float H3[m][n];
+
 
 	//for t = 1 : maxLoops
 	for(int t=0; t < maxLoops; t++) {
@@ -86,10 +91,12 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		
  		transpose(maxColSumP())
 	}
-}
+} //end of function
 
-void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float maxColSum, float precision, float* X){
-	//function X = maxColSumP (Y, H, maxColSum, precision)
+
+//function X = maxColSumP (Y, H, maxColSum, precision)
+void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X){
+
 
 	//X = unconstrainedP (Y, H);
 	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
@@ -97,19 +104,30 @@ void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float maxColSum, float
 	//Xsum = sum(X);
 	for(int i=0; i < Ydim1; i++){
 		for(int j=0; j < Ydim2; j++){
+
 			Xsum += *(X + i*Ydim2 + j);
-		}
+
+		} 
 	}
 
-	//for i = find(Xsum > maxColSum)
+
+//for i = find(Xsum > maxColSum)
+	for(int i=0; i<n; i++){
+		if(Xsum > *(maxColSum + i)){
+			
+			exactTotalSum(Y, H, i, *(maxColSum + i), precision, X, n);
+
+		}
+	}
 	//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
-}
+
 
 void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float eps){
 	//function X = unconstrainedP (Y, H)
 	for(int i=0; i<size1; i++) {
 		for(int j=0; j<size2; j++) {
 			//X = Y ./ H;
+
 			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
 
 			//X(find(X < eps)) = eps;
@@ -118,11 +136,48 @@ void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float ep
 			}
 		}
 	}
-}
+} // end of function
 
-void exactTotalSum(float* y, float* h, float totalSum, float precision){
+
+
 //function x = exactTotalSum (y, h, totalSum, precision)
+void exactTotalSum(float* y, float* h, int i; float totalSum, float precision, float* X, int n) {
 // y and h are vectors, totalSum and precision are scalars
 
+	float totalSumMinus = totalSum - precision;
+	
+	float curAlpha = -(min(h)) + eps;
 
-}
+//stepAlpha = max(10, abs(curAlpha/10));
+	float stepAlpha, newAlpha, newSum;
+	if(10 > abs(curAlpha/10)){
+		stepAlpha = 10;
+	} else{
+		stepAlpha = abs(curAlpha/10);
+	}
+
+	for(int j=0; j < 50; j++){
+
+		newAlpha = curAlpha + stepAlpha;
+
+//x = y ./ (h + newAlpha);
+		for(int k=0; k < n; k++){
+			*(X + i*n + k) = *(y + i*n + k) / (*(h + i*n + k) + newAlpha);
+//newSum = sum(x);
+			newSum += *(X + i*n + k);
+		}
+
+		if(newSum > totalSum){
+			curAlpha = newAlpha;
+		}else{
+			if (newSum < totalSumMinus){
+				stepAlpha = stepAlpha / 2;
+			}else{
+				return;
+			}
+		}
+	}
+
+
+} //end of function
+
