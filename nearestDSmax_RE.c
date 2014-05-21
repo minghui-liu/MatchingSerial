@@ -79,17 +79,27 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		// H1 = lambda1 - (Y ./ (F3+eps));
 		float F3eps[m][n];
 		matPlusScaler(F3, eps, F3eps, m, n);
-		float Ydiv[m][n]; 
-		matDiv(Y, F3eps, Ydiv, m, n)
+		float YdivF3eps[m][n]; 
+		matDiv(Y, F3eps, YdivF3eps, m, n)
 		matSub(lambda1, Ydiv, H1, m, n);
 		
-		// (Y ./ (F3 + eps))
-
 		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
-		
+		float negH1[m][n]; 
+		matTimesScaler(H, -1, negH1, m, n);
+		float Yt[n][m]
+		transpose(Y, Yt, m, n);
+		float maxRowSumT[1][m];
+		transpose(maxRowSum, maxRowSumT, m, 1);
+		maxColSumP(Yt, n, m, negH1, maxRowSumT, precision, F1);
+
 		// lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
-		
- 		transpose(maxColSumP())
+		float F1eps[m][n];
+		matPlusScaler(F1, eps, F3eps, m, n);
+		float YdivF1eps[m][n]; 
+		matDiv(Y, F1eps, YdivF1eps, m, n);
+		matSub(lambda1, YdivF3eps, lambda1, m, n);
+		matAdd(lambda1, YdivF1eps, lambda1, m, n);
+		 
 	}
 } //end of function
 
