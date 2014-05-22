@@ -141,8 +141,9 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		matAdd(F1, F2, F, m, n);
 		matAdd(F, F3, F, m, n);
 		ones(Fdiv, m, n);
-		matTimesScaler(Fdiv, 3, Fdiv, m, n);
+		atTimesScaler(Fdiv, 3, Fdiv, m, n);
 		matDiv(F, Fdiv, F, m, n);
+
 		 
 	}
 } //end of function
