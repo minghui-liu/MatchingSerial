@@ -81,7 +81,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		matPlusScaler(F3, eps, F3eps, m, n);
 		float YdivF3eps[m][n]; 
 		matDiv(Y, F3eps, YdivF3eps, m, n)
-		matSub(lambda1, Ydiv, H1, m, n);
+		matSub(lambda1, YdivF3eps, H1, m, n);
 		
 		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
 		float negH1[m][n]; 
