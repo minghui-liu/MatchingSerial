@@ -25,7 +25,7 @@ F [Output] - The nearest generalized doubly stochastic F to Ker in relative entr
 Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass 
 */
 
-void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum, float totalSum, float precision, float maxLoops){
+void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum, float totalSum, float precision, float maxLoops, float* F){
 //m and n are the dimensions of Y
 
 /*
