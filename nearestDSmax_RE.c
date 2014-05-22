@@ -222,10 +222,10 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 //get the minimum of vector h
 	float min = *(h);
 	for (int i=1; i < length; i++) {
-		min = (min < *(h+i))? m : *(h+i);
+		min = (min < *(h+i))? min : *(h+i);
 	}
 
- 	curAlpha = -min + eps;
+ 	curAlpha = -min + precision;
 
 //stepAlpha = max(10, abs(curAlpha/10));
 	float stepAlpha, newAlpha, newSum;
@@ -238,6 +238,8 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 	for(int j=0; j < 50; j++){
 
 		newAlpha = curAlpha + stepAlpha;
+
+		newSum = 0;
 
 //x = y ./ (h + newAlpha);
 		for(int k=0; k < length; k++){
