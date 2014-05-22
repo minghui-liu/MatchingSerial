@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "utils.c"
 
 /*
 function F = nearestDSmax_RE (Y, maxRowSum, maxColSum, totalSum, precision, maxLoops)
@@ -168,12 +169,13 @@ void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, floa
 //for i = find(Xsum > maxColSum)
 	for(int i=0; i<n; i++){
 		if(Xsum > *(maxColSum + i)){
-			
+
+//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);			
 			exactTotalSum(Y, H, i, *(maxColSum + i), precision, X, n);
 
 		}
 	}
-	//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
+
 
 
 void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float eps){
@@ -197,10 +199,19 @@ void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float ep
 //function x = exactTotalSum (y, h, totalSum, precision)
 void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X, int length) {
 // y and h are vectors, totalSum and precision are scalars
+//X is the return vector and length is the length of y, h, and X
 
 	float totalSumMinus = totalSum - precision;
 	
-	float curAlpha = -(min(h)) + eps;
+	float curAlpha;
+
+//get the minimum of vector h
+	float min = *(h);
+	for (int i=1; i < length; i++) {
+		min = (min < *(h+i))? m : *(h+i);
+	}
+
+ 	curAlpha = -min + eps;
 
 //stepAlpha = max(10, abs(curAlpha/10));
 	float stepAlpha, newAlpha, newSum;

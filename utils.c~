@@ -90,7 +90,7 @@ void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, in
  * diff: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim2){
+void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim2) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			*(diff + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) - *(in_matrix2 + i * dim2 + j);
@@ -103,7 +103,7 @@ void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim
  * sum: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2){
+void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) + *(in_matrix2 + i * dim2 + j);
@@ -114,10 +114,24 @@ void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2
 /* Perform matrix and scaler addtion and return the sum 
  * in_matrix1: input matrix
  * scaler: input scaler
+ * product: output matrix
+ * dim1 dim2: the dimension of the matrix 
+ */
+void matTimesScaler(float *in_matrix, float scaler, float* product, int dim1, int dim2) {
+	for(int i=0; i < dim1; i++){
+		for(int j=0; j < dim2; j++){
+			*(product + i * dim2 + j) = *(in_matrix + i * dim2 + j) * scaler;
+		}
+	}
+}
+
+/* Perform matrix and scaler multiplication and return the product 
+ * in_matrix1: input matrix
+ * scaler: input scaler
  * sum: output matrix
  * dim1 dim2: the dimension of the matrix 
  */
-void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim2){
+void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim2) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			*(sum + i * dim2 + j) = *(in_matrix + i * dim2 + j) + scaler;
@@ -214,5 +228,14 @@ void getCol(float *in_matrix, int size1, int size2, float *output, int colnum) {
 	for(int i=0; i<size1; i++) {
 		*(output+i) = *(in_matrix + i*size2 + (colnum-1));
 	}
+}
+
+/* find an element in an array and return its index */
+int indexOfElement(float *in, int size, float element) {
+	for (int i=0; i<size; i++) {
+		if (*(in + i) == element)
+			return i;
+	}
+	return -1;
 }
 
