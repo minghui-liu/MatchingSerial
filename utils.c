@@ -239,3 +239,18 @@ int indexOfElement(float *in, int size, float element) {
 	return -1;
 }
 
+/* reshapes a matrix into another dimension
+ * the number of elements must remain the same
+ */
+void reshape(float *in, int insize1, int insize2, float *out, int outsize1, int outsize2) {
+	if (insize1*insize2 == outsize1*outsize2) {
+		int c = 0;
+		for (int i=0; i<insize2; i++) {
+			for (int j=0; j<insize1; j++) {
+				*(out+(c%outsize1)*outsize2+(c/outsize1)) = *(in+j*insize2+i);
+				c++;
+			}
+		}
+	} else	
+		printf("Error: cannot reshape. the number of elements must agree");
+}
