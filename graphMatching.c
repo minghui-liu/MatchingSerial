@@ -15,11 +15,11 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
  	sigma 	 			Kernel parameter for edge-to-edge correlations.
  	numberOfMatches  	number of matches required. 
 
- 	X [Output]  	an n1 by n2 matrix with the hard matching results.
+ 	X [Output]  	a size1 by size2 matrix with the hard matching results.
              		The i,j entry is one iff the i-th feature of the first object
              		match the j-th feature of the second object. Zero otherwise.
  
-	Z [Output]  	an n1 by n2 matrix with the soft matching results.
+	Z [Output]  	a size1 by size2 matrix with the soft matching results.
              		The i,j entry is the probablity that the i-th feature of the
              		first object match the j-th feature of the second object.
  
