@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "utils.c"
+#include "hypergraphMatching.c"
 
-void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int numberOfMatches){
+void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int numberOfMatches, float *X, float *Z, float *Y){
 
 /*	Algorithm due to R. Zass and A. Shashua.,
  	'Probabilistic Graph and Hypergraph Matching.',
@@ -28,21 +29,20 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 
 	//Check to make sure the matrices are symmetric	
 	if(isSymmetric(G1,size1) == 0) {
-		System.out.print("G1 is not symmetric \n");
+		printf("G1 is not symmetric \n");
 	}
 	
 	if(isSymmetric(G2,size2) == 0) {
-		System.out.print("G2 is not symmetric \n");
+		printf("G2 is not symmetric \n");
 	}
 
 	// tranpose G2
-	float *G2t;
+	float G2t[size2][size2];
 	transpose(G2, G2t, size2, size2);
 	
-	// creat Y and make it an all zero matrix
-	float Y[size1][size2];
+	// make Y an all zero matrix
 	zeros(Y, size1, size2);
-	double* d, d1, d2, G1_i, G2t_j;
+	float d[size1][size2], d1[size1][size2], d2[size1][size2], G1_i[size1], G2t_j[size2];
 
 	for(int i=0; i < size1; i++) {
 		for(int j=0; j < size2; j++) {
@@ -58,29 +58,28 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 			repmat(G2t_j, d2, 1, size2, size1, 1);
 
 			// d = ... - ...
-			matSub(d, d1, d2);
+			matSub(d1, d2, d, size1, size2);
 
 			//Y = Y + exp((-d.*d) ./ sigma);
 
 			//exp((-d.*d) ./ sigma)
-			for(int i=0; i < dimD; i++) {
-				for(int j=0; j<dimD2; j++) {
-					d[i][j] = exp((-d[i][j] * d[i][j]) / sigma);
+			for(int k=0; k < size1; k++) {
+				for(int l=0; l < size2; l++) {
+					d[k][l] = exp((-d[k][l] * d[k][l]) / sigma);
 				}
 			}
 
 			// Y = Y + ...
-			for(int i=0; i < size1; i++) {
-				for(int j=0; j<size2; j++) {
-					Y[i][j] += d[i][j];
+			for(int u=0; u < size1; u++) {
+				for(int v=0; v < size2; v++) {
+					*(Y+u*size2+v) += d[u][v];
 				}
 			}
 			
 		}
 	}
 
-
-
-
+	/* do hypergraphMatching over Y */
+	hypergraphMatching(Y, size1, size2, numberOfMatches, X, Z);
 
 }
