@@ -147,11 +147,10 @@ void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim
 void matDiv(float *in_matrix1, float *in_matrix2, float* out, int dim1, int dim2){
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) / *(in_matrix2 + i * dim2 + j);
+			*(out + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) / *(in_matrix2 + i * dim2 + j);
 		}
 	}
 }
-
 /* find the maximum element in an array */
 float maxOfArray(float *array, int size) {
 	float m = array[0];
@@ -230,7 +229,10 @@ void getCol(float *in_matrix, int size1, int size2, float *output, int colnum) {
 	}
 }
 
-/* find an element in an array and return its index */
+/* find an element in an array and return its index 
+ * note: this function only returns the index of the 
+ * first match element
+ */
 int indexOfElement(float *in, int size, float element) {
 	for (int i=0; i<size; i++) {
 		if (*(in + i) == element)

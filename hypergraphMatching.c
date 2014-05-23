@@ -23,22 +23,13 @@
  
 #include <math.h>
 #include "utils.c"
+#include "nearestDSmax_RE.c"
 
-void hypergraphMatching(float *Y, int size1, int size2, int numberOfMatches, float *X, float*Z) {
-	float maxRowSum[size1];
-	ones(maxRowSum, size1, 1);
-	float maxColSum[size2];
-	ones(maxColSum, 1, size2);
-	
-	nearestDSmax_RE(Y, maxRowSum, maxColumSum, numberOfMatches, Z);
-	soft2hard(Z, numberOfMatches, X);
-}
-
-void soft2hard(float *soft, int size1, size2, float *hard, int numberOfMatches, float *hard) {
+void soft2hard(float *soft, int size1, int size2, int numberOfMatches, float *hard) {
 	zeros(hard, size1, size2);
 	for (int i=0; i<numberOfMatches; i++) {
 		float maxSoft[size1][1];
-		maxOfMatrix(soft, size1, size2, &maxSoft, 2)
+		maxOfMatrix(soft, size1, size2, &maxSoft, 2);
 		// dummy is the max element in maxSoft, r is its position in maxSoft
 		float dummy = maxOfArray(maxSoft,size2);
 		int r = indexOfElement(maxSoft, size1, dummy);
@@ -51,15 +42,27 @@ void soft2hard(float *soft, int size1, size2, float *hard, int numberOfMatches, 
 		
 		if (val < 0)
 			return;
-		hard[r][c] = 1;
+		*(hard+r*size2+c) = 1;
 		// soft(r,:) = -inf;
 		for (int j=0; j<size2; j++) {
 			*(soft+r*size2+j) = -INFINITY;				
 		}
 		// soft(:,c)
-		for (in k=0; k<size1; k++) {
+		for (int k=0; k<size1; k++) {
 			*(soft+k*size2+k) = -INFINITY;
 		}
 	}
 }
+
+void hypergraphMatching(float *Y, int size1, int size2, int numberOfMatches, float *X, float *Z) {
+	// do i need to use maxRowSum[size1][1] here? Seems doesnt make a difference
+	float maxRowSum[size1];
+	ones(maxRowSum, size1, 1);
+	float maxColSum[size2];
+	ones(maxColSum, 1, size2);
+	
+	nearestDSmax_RE(Y,size1,size2,maxRowSum,maxColSum,numberOfMatches,0.01,1000,Z);
+	soft2hard(Z, size1, size2, numberOfMatches, X);
+}
+
 
