@@ -78,16 +78,14 @@ void colVec(float *matrix, float* vector, int size1, int size2){
 } 
 
 void main() {
-	float colY[9], colH[9];
+	float colY[9];
 	float y[3][3] = {{4, 5, 2}, {3, 9, 10}, {4, 5, 0.5}};
 	float h[3][3] = {{5, 6, 9}, {10, 12, 13}, {1, 1, 1}};
-	colVec(y, colY, 3, 3);
-	colVec(h, colH, 3, 3);
 	float totalSum = 48;
 	float precision = 0.01;
 	int length = 9;
 	float X[9];
-	exactTotalSum(colY, colH, totalSum, precision, X, length);
+	exactTotalSum(y, h, totalSum, precision, X, length);
 	printMatrix(X, 9, 1);
 
 }
