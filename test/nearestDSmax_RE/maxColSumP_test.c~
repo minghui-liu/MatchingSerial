@@ -95,7 +95,7 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 
 void getCol(float *in_matrix, int size1, int size2, float *output, int colnum) {
 	for(int i=0; i<size1; i++) {
-		*(output+i) = *(in_matrix + i*size2 + (colnum-1));
+		*(output+i) = *(in_matrix + i*size2 + colnum);
 	}
 }
 
@@ -106,27 +106,30 @@ void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, floa
 
 //X = unconstrainedP (Y, H);
 	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
+	printMatrix(X, 4, 4);
 
 //Xsum = sum(X);
-	float Xsum = 0;
+	float Xsum[Ydim1];
 	for(int i=0; i < Ydim1; i++){
 		for(int j=0; j < Ydim2; j++){
-			Xsum += *(X + i*Ydim2 + j);
+			Xsum[i] += *(X + i*Ydim2 + j);
 		} 
 	}
-//float yCol[Ydim2], hCol[Ydim2], Xcol[Ydim2];
+
+float yCol[Ydim2], hCol[Ydim2], Xcol[Ydim2];
 //for i = find(Xsum > maxColSum)
 	float Ydim = Ydim1*Ydim2;	
 	for(int i=0; i < Ydim1; i++){
-		if(Xsum > *(maxColSum + i)){
+		if(Xsum[i] > *(maxColSum + i)){
 //X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
-/*			getCol(Y, Ydim1, Ydim2, yCol, i);
+			getCol(Y, Ydim1, Ydim2, yCol, i);
 			getCol(H, Ydim1, Ydim2, hCol, i);
-			getCol(X, Ydim1, Ydim2, Xcol, i); */
-			exactTotalSum(Y, H, *(maxColSum + i), precision, X, Ydim1);
-/*			for(int j=0; j < Ydim1; j++){
+
+			exactTotalSum(yCol, hCol, *(maxColSum + i), precision, Xcol, Ydim1);
+
+			for(int j=0; j < Ydim1; j++){
 				*(X + j*Ydim1 + i) = *(Xcol + j);
-			}*/
+			}
 		}
 	}
 } // end of function
