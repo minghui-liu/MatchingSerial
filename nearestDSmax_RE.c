@@ -74,7 +74,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 	float H3[m][n];
 
 
-	//for t = 1 : maxLoops
+//for t = 1 : maxLoops
 	for(int t=0; t < maxLoops; t++) {
 
 // Max row sum 
@@ -136,7 +136,22 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		matSub(lambda3, YdivF2eps, lambda3, m, n);
 		matAdd(lambda3, YdivF3eps, lambda3, m, n);
 
+
+//if (max(abs(F1(:) - F2(:))) < precision && max(abs(F1(:) - F3(:))) < precision)
+		float Fdiff1[m*n], Fdiff2[m*n];
+		for(int i=0; i < m; i++){
+			for(int j=0; j < n; j++){
+				Fdiff1[i*n + j] = abs(F1[i][j] - F2[i][j]);
+				Fdiff2[i*n + j] = abs(F1[i][j] - F3[i][j]);
+			}
 		}
+		fdMax1 = maxOfArray(Fdiff1, m*n);
+		fdMax2 = maxOfArray(Fdiff2, m*n);
+		if( fdMax1 < precision && fdMax2 < precision ){
+			break;
+		}
+
+	} // end of t for loop
 
 		// F = (F1 + F2 + F3) / 3;
 		matAdd(F1, F2, F, m, n);
@@ -145,7 +160,6 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		matTimesScaler(Fdiv, 3, Fdiv, m, n);
 		matDiv(F, Fdiv, F, m, n);
 		 
-	}
 } //end of function
 
 
@@ -208,10 +222,10 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 //get the minimum of vector h
 	float min = *(h);
 	for (int i=1; i < length; i++) {
-		min = (min < *(h+i))? m : *(h+i);
+		min = (min < *(h+i))? min : *(h+i);
 	}
 
- 	curAlpha = -min + eps;
+ 	curAlpha = -min + precision;
 
 //stepAlpha = max(10, abs(curAlpha/10));
 	float stepAlpha, newAlpha, newSum;
@@ -224,6 +238,8 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 	for(int j=0; j < 50; j++){
 
 		newAlpha = curAlpha + stepAlpha;
+
+		newSum = 0;
 
 //x = y ./ (h + newAlpha);
 		for(int k=0; k < length; k++){
@@ -242,7 +258,6 @@ void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X
 			}
 		}
 	}
-
 
 } //end of function
 
