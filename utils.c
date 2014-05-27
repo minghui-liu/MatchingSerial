@@ -4,9 +4,11 @@
  *
  * Reid Delaney & Kevin Liu
  */
+#pragma once
 
 #include <stdio.h>
 #include <math.h>
+
 
 /* transpose a size1*size2 matrix
  * returns a pointer to the new matrix

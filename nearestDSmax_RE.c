@@ -27,6 +27,109 @@ F [Output] - The nearest generalized doubly stochastic F to Ker in relative entr
 Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass 
 */
 
+
+
+
+//function x = exactTotalSum (y, h, totalSum, precision)
+void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X, int length) {
+
+	// y and h are vectors, totalSum and precision are scalars
+	//X is the return vector and length is the length of y, h, and X
+	float totalSumMinus = totalSum - precision;
+	float curAlpha;
+
+	//get the minimum of vector h
+	float min = *(h);
+	for (int i=1; i < length; i++)
+		min = (min < *(h+i))? min : *(h+i);
+
+ 	curAlpha = -min + precision;
+
+	//stepAlpha = max(10, abs(curAlpha/10));
+	float stepAlpha, newAlpha, newSum;
+	if(10 > abs(curAlpha/10))
+		stepAlpha = 10;
+	else
+		stepAlpha = abs(curAlpha/10);
+
+	for(int j=0; j < 50; j++) {
+		newAlpha = curAlpha + stepAlpha;
+		newSum = 0;
+
+		//x = y ./ (h + newAlpha);
+		for(int k=0; k < length; k++) {
+			*(X + k) = *(y + k) / (*(h + k) + newAlpha);
+			//newSum = sum(x);
+			newSum += *(X + k);
+		}
+
+		if(newSum > totalSum) {
+			curAlpha = newAlpha;
+		} else {
+			if (newSum < totalSumMinus)
+				stepAlpha = stepAlpha / 2;
+			else return;
+		}
+	
+	} //end of for j
+
+} //end of function
+
+
+
+void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float eps){
+	//function X = unconstrainedP (Y, H)
+	for(int i=0; i<size1; i++) {
+		for(int j=0; j<size2; j++) {
+			//X = Y ./ H;
+			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
+
+			//X(find(X < eps)) = eps;
+			if(*(X + i*size2 + j) < eps) {
+				*(X + i*size2 + j) = eps;
+			}
+
+		} // end of for j
+	} // end of for i
+} // end of function
+
+
+
+//function X = maxColSumP (Y, H, maxColSum, precision)
+void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X) {
+	//X = unconstrainedP (Y, H);
+	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
+	
+	//Xsum = sum(X);
+	float Xsum[Ydim1];
+	for(int i=0; i < Ydim1; i++){
+		for(int j=0; j < Ydim2; j++){
+			Xsum[i] += *(X + i*Ydim2 + j);
+		} 
+	}
+
+float yCol[Ydim2], hCol[Ydim2], Xcol[Ydim2];
+float Ydim = Ydim1*Ydim2;	
+
+//for i = find(Xsum > maxColSum)
+	for(int i=0; i < Ydim1; i++){
+		if(Xsum[i] > *(maxColSum + i)){
+
+//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
+			getCol(Y, Ydim1, Ydim2, yCol, i);
+			getCol(H, Ydim1, Ydim2, hCol, i);
+
+			exactTotalSum(yCol, hCol, *(maxColSum + i), precision, Xcol, Ydim1);
+
+			for(int j=0; j < Ydim1; j++){
+				*(X + j*Ydim1 + i) = *(Xcol + j);
+			}
+		}
+	}
+} // end of function
+
+
+
 void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum, float totalSum, float precision, float maxLoops, float* F){
 //m and n are the dimensions of Y
 
@@ -160,104 +263,5 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		matTimesScaler(Fdiv, 3, Fdiv, m, n);
 		matDiv(F, Fdiv, F, m, n);
 		 
-} //end of function
-
-
-//function X = maxColSumP (Y, H, maxColSum, precision)
-
-void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X) {
-	//X = unconstrainedP (Y, H);
-	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
-	
-	//Xsum = sum(X);
-	float Xsum[Ydim1];
-	for(int i=0; i < Ydim1; i++){
-		for(int j=0; j < Ydim2; j++){
-			Xsum[i] += *(X + i*Ydim2 + j);
-		} 
-	}
-
-float yCol[Ydim2], hCol[Ydim2], Xcol[Ydim2];
-float Ydim = Ydim1*Ydim2;	
-
-//for i = find(Xsum > maxColSum)
-	for(int i=0; i < Ydim1; i++){
-		if(Xsum[i] > *(maxColSum + i)){
-
-//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
-			getCol(Y, Ydim1, Ydim2, yCol, i);
-			getCol(H, Ydim1, Ydim2, hCol, i);
-
-			exactTotalSum(yCol, hCol, *(maxColSum + i), precision, Xcol, Ydim1);
-
-			for(int j=0; j < Ydim1; j++){
-				*(X + j*Ydim1 + i) = *(Xcol + j);
-			}
-		}
-	}
-} // end of function
-
-
-
-void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float eps){
-	//function X = unconstrainedP (Y, H)
-	for(int i=0; i<size1; i++) {
-		for(int j=0; j<size2; j++) {
-			//X = Y ./ H;
-			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
-
-			//X(find(X < eps)) = eps;
-			if(*(X + i*size2 + j) < eps) {
-				*(X + i*size2 + j) = eps;
-			}
-
-		} // end of for j
-	} // end of for i
-} // end of function
-
-
-//function x = exactTotalSum (y, h, totalSum, precision)
-void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X, int length) {
-
-	// y and h are vectors, totalSum and precision are scalars
-	//X is the return vector and length is the length of y, h, and X
-	float totalSumMinus = totalSum - precision;
-	float curAlpha;
-
-	//get the minimum of vector h
-	float min = *(h);
-	for (int i=1; i < length; i++)
-		min = (min < *(h+i))? min : *(h+i);
-
- 	curAlpha = -min + precision;
-
-	//stepAlpha = max(10, abs(curAlpha/10));
-	float stepAlpha, newAlpha, newSum;
-	if(10 > abs(curAlpha/10))
-		stepAlpha = 10;
-	else
-		stepAlpha = abs(curAlpha/10);
-
-	for(int j=0; j < 50; j++) {
-		newAlpha = curAlpha + stepAlpha;
-		newSum = 0;
-
-		//x = y ./ (h + newAlpha);
-		for(int k=0; k < length; k++) {
-			*(X + k) = *(y + k) / (*(h + k) + newAlpha);
-			//newSum = sum(x);
-			newSum += *(X + k);
-		}
-
-		if(newSum > totalSum) {
-			curAlpha = newAlpha;
-		} else {
-			if (newSum < totalSumMinus)
-				stepAlpha = stepAlpha / 2;
-			else return;
-		}
-	
-	} //end of for j
-
 } //end of function
 
