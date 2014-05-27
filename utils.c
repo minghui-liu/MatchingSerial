@@ -98,7 +98,7 @@ void repmat(int size1, int size2, float in_matrix[size1][size2], int m, int n, f
  * diff: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matSub(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[dim1][dim2], float diff[dim1][dim2], ) {
+void matSub(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[dim1][dim2], float diff[dim1][dim2]) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			//*(diff + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) - *(in_matrix2 + i * dim2 + j);
@@ -127,7 +127,7 @@ void matAdd(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[d
  * product: output matrix
  * dim1 dim2: the dimension of the matrix 
  */
-void matTimesScaler(int dim1, int dim2, float in_matrix[dim1][dim2], float scaler, float product[dim1][dim2], ) {
+void matTimesScaler(int dim1, int dim2, float in_matrix[dim1][dim2], float scaler, float product[dim1][dim2]) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
 			//*(product + i * dim2 + j) = *(in_matrix + i * dim2 + j) * scaler;
@@ -184,7 +184,7 @@ float maxOfArray(int size,float array[size]) {
  * maxOfMatrix(A,1) will return [7 8 9]
  * maxOfMatrix(A,2) will return [3 6 9]                            
  */
-void maxOfMatrix(int size1, int size2, float matrix[dize1][size2], float *out, int dim) {
+void maxOfMatrix(int size1, int size2, float matrix[size1][size2], float *out, int dim) {
 	if (dim == 1) {
 		for(int i=0; i<size2; i++) {
 			//float m = *(matrix + i);
@@ -212,7 +212,7 @@ void maxOfMatrix(int size1, int size2, float matrix[dize1][size2], float *out, i
  * matrix: pointer to the matrix to be printed
  * size1 size2: size of matrix
  */
-void printMatrix( int size1, int size2, float matrix[size1][dize2]) {
+void printMatrix( int size1, int size2, float matrix[size1][size2]) {
 	for (int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++) {
 			//printf("%.2f ", *(matrix + i*size2 + j));
@@ -271,7 +271,7 @@ void reshape(int insize1, int insize2, float in[insize1][insize2], int outsize1,
 		for (int i=0; i<insize2; i++) {
 			for (int j=0; j<insize1; j++) {
 				//*(out+(c%outsize1)*outsize2+(c/outsize1)) = *(in+j*insize2+i);
-				out[c%outsize][c/outsize1] = in[j][i];
+				out[c%outsize2][c/outsize1] = in[j][i];
 				c++;
 			}
 		}
