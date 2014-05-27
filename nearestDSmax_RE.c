@@ -130,7 +130,7 @@ float Ydim = Ydim1*Ydim2;
 
 
 
-void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum, float totalSum, float precision, float maxLoops, float* F){
+void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float maxColSum[size2], float totalSum, float precision, float maxLoops, float* F){
 //m and n are the dimensions of Y
 
 /*

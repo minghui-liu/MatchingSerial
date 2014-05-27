@@ -4,7 +4,7 @@
 #include "utils.c"
 #include "hypergraphMatching.c"
 
-void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int numberOfMatches, float *X, float *Z, float *Y){
+void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2][size2], float sigma, int numberOfMatches, float X[size1][size2], float Z[size1][size2], float Y[size1][size2]){
 
 /*	Algorithm due to R. Zass and A. Shashua.,
  	'Probabilistic Graph and Hypergraph Matching.',
@@ -38,10 +38,10 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 
 	// tranpose G2
 	float G2t[size2][size2];
-	transpose(G2, G2t, size2, size2);
+	transpose(size2, size2, G2, G2t);
 	
 	// make Y an all zero matrix
-	zeros(Y, size1, size2);
+	zeros(size1, size2, Y);
 	float d[size1][size2], d1[size1][size2], d2[size1][size2], G1_i[size1], G2t_j[size2];
 
 	for(int i=0; i < size1; i++) {
@@ -49,16 +49,16 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 			//d = repmat(G1(:,i), 1, n2) - repmat(G2t(j, :), n1, 1);
 
 			//...G1(:,i)...
-			getCol(G1,size1,size1,G1_i,i);
+			getCol(size1, size1, G1, G1_i, i);
 			// ...G2t(j,:)...
-			getRow(G2t,size2,size2,G2t_j,j);	
+			getRow(size2, size2, G2t, G2t_j, j);	
 			//...repmat(G1(:,i), 1, n2)...
-			repmat(G1_i, d1, size1, 1, 1, size2);
+			repmat(size1, 1, G1_i, 1, size2, d1);
 			//...repmat(G2t(j, :), n1, 1);
-			repmat(G2t_j, d2, 1, size2, size1, 1);
+			repmat(1, size2, G2t_j, size1, 1, d2);
 
 			// d = ... - ...
-			matSub(d1, d2, d, size1, size2);
+			matSub(size1, size2, d1, d2, d);
 
 			//Y = Y + exp((-d.*d) ./ sigma);
 
@@ -80,6 +80,6 @@ void graphMatching(float* G1, int size1, float* G2, int size2, float sigma, int 
 	}
 
 	/* do hypergraphMatching over Y */
-	hypergraphMatching(Y, size1, size2, numberOfMatches, X, Z);
+	hypergraphMatching(size1, size2, Y, numberOfMatches, X, Z);
 
 }

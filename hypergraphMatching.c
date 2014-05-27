@@ -25,44 +25,47 @@
 #include "utils.c"
 #include "nearestDSmax_RE.c"
 
-void soft2hard(float *soft, int size1, int size2, int numberOfMatches, float *hard) {
-	zeros(hard, size1, size2);
+void soft2hard(int size1, int size2, float soft[size1][size2], int numberOfMatches, float hard[size1][size2]) {
+	zeros(size1, size2, hard);
 	for (int i=0; i<numberOfMatches; i++) {
 		float maxSoft[size1][1];
-		maxOfMatrix(soft, size1, size2, &maxSoft, 2);
+		maxOfMatrix(size1, size2, soft, maxSoft, 2);
 		// dummy is the max element in maxSoft, r is its position in maxSoft
-		float dummy = maxOfArray(maxSoft,size2);
-		int r = indexOfElement(maxSoft, size1, dummy);
+		float dummy = maxOfArray(size2, maxSoft);
+		int r = indexOfElement(size1, maxSoft, dummy);
 
 		// val is the max of soft(r,:), c is the index of val in soft(r,:)
 		float softR[size2];
-		getRow(soft,size1,size2,softR,r);
-		float	val = maxOfArray(softR,size2);
-		int c = indexOfElement(softR, size2, val);
+		getRow(size1,size2,soft,softR,r);
+		float val = maxOfArray(size2, softR);
+		int c = indexOfElement(size2, softR,val);
 		
 		if (val < 0)
 			return;
-		*(hard+r*size2+c) = 1;
+		//*(hard+r*size2+c) = 1;
+		hard[r][c] = 1;
 		// soft(r,:) = -inf;
 		for (int j=0; j<size2; j++) {
-			*(soft+r*size2+j) = -INFINITY;				
+			//*(soft+r*size2+j) = -INFINITY;
+			soft[r][j] = -INFINITY;			
 		}
-		// soft(:,c)
+		// soft(:,c) = -inf;
 		for (int k=0; k<size1; k++) {
-			*(soft+k*size2+k) = -INFINITY;
+			//*(soft+c*size2+k) = -INFINITY;
+			soft[c][k] = -INFINITY;
 		}
 	}
 }
 
-void hypergraphMatching(float *Y, int size1, int size2, int numberOfMatches, float *X, float *Z) {
+void hypergraphMatching(int size1, int size2, float Y[size1][size2], int numberOfMatches, float X[size1][size2], float Z[size1][size2]) {
 	// do i need to use maxRowSum[size1][1] here? Seems doesnt make a difference
-	float maxRowSum[size1];
-	ones(maxRowSum, size1, 1);
+	float maxRowSum[size1][1];
+	ones(size1, 1, maxRowSum);
 	float maxColSum[size2];
-	ones(maxColSum, 1, size2);
+	ones(1, size2, maxColSum);
 	
-	nearestDSmax_RE(Y,size1,size2,maxRowSum,maxColSum,numberOfMatches,0.01,1000,Z);
-	soft2hard(Z, size1, size2, numberOfMatches, X);
+	nearestDSmax_RE(size1,size2,Y,maxRowSum,maxColSum,numberOfMatches,0.01,1000,Z);
+	soft2hard(size1, size2, Z, numberOfMatches, X);
 }
 
 

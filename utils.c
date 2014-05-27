@@ -13,10 +13,11 @@
 /* transpose a size1*size2 matrix
  * returns a pointer to the new matrix
  */
-void transpose(float *in_matrix, float *out_matrix, int size1, int size2) {
+void transpose(int size1, int size2, float in_matrix[size1][size2], float out_matrix[size1][size2]) {
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(out_matrix + j*size1 + i) = *(in_matrix + i*size2 + j);
+			//*(out_matrix + j*size1 + i) = *(in_matrix + i*size2 + j);
+			out_matrix[j][i] = in_matrix[i][j];
 		}
 	}
 }
@@ -24,10 +25,11 @@ void transpose(float *in_matrix, float *out_matrix, int size1, int size2) {
 /* make Y an all zero matrix
  * size1 and size2 are the size of Y
  */
-void zeros(float *Y, int size1, int size2){
+void zeros(int size1, int size2, float Y[size1][size2]){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*size2 + j) ) = 0;
+			//*(Y + (i*size2 + j) ) = 0;
+			Y[i][j] = 0;
 		}
 	}
 }
@@ -35,10 +37,11 @@ void zeros(float *Y, int size1, int size2){
 /* make Y an all one matrix
  * size1 and size2 are the size of Y
  */
-void ones(float *Y, int size1, int size2){
+void ones(int size1, int size2, float Y[size1][size2]){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
-			*(Y + (i*size2 + j) ) = 1;
+			//*(Y + (i*size2 + j) ) = 1;
+			Y[i][j] = 1;
 		}
 	}
 }
@@ -47,11 +50,12 @@ void ones(float *Y, int size1, int size2){
  * size: the size of the matrix
  * returns 1 if true, 0 if false
  */
-int isSymmetric(float *in_matrix, int size){
+int isSymmetric(int size, float in_matrix[size][size]){
 	double diff;
 	for(int i=0; i < size; i++){
 		for(int j=0; j < size; j++){
-			diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
+			//diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
+			diff = in_matrix[i][j] - in_matrix[j][i];
 			if(diff != 0){
 				return 0;
 			}
@@ -65,11 +69,12 @@ int isSymmetric(float *in_matrix, int size){
  * eps: the epsilon value
  * returns 1 if true 0 if false
  */
-int isSymmetric_eps(float *in_matrix, int size, double eps) {
+int isSymmetric_eps(int size, double eps, float in_matrix[size][size]) {
 	double diff;
 	for(int i=0; i < size; i++){
 		for(int j=0; j < size; j++){
-			diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
+			//diff = *(in_matrix + i*size + j) - *(in_matrix + j*size + i);
+			diff = in_matrix[i][j] - in_matrix[j][i];
 			if(diff > eps || diff < -eps){
 				return 0;
 			}
@@ -79,10 +84,11 @@ int isSymmetric_eps(float *in_matrix, int size, double eps) {
 }
 
 /* creates a m*n tiling of a matrix */
-void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, int n) {
+void repmat(int size1, int size2, float in_matrix[size1][size2], int m, int n, float out_matrix[m][n]) {
 	for(int i=0; i<size1*m; i++) {
 		for(int j=0; j<size2*n; j++) {
-			*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
+			//*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
+			out_matrix[i][j] = in_matrix[i%size1][j%size2];
 		}
 	}
 }
@@ -92,10 +98,11 @@ void repmat(float *in_matrix, float *out_matrix, int size1, int size2, int m, in
  * diff: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim2) {
+void matSub(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[dim1][dim2], float diff[dim1][dim2], ) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(diff + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) - *(in_matrix2 + i * dim2 + j);
+			//*(diff + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) - *(in_matrix2 + i * dim2 + j);
+			diff[i][j] = in_matrix1[i][j] - in_matrix2[i][j];
 		}
 	}
 }
@@ -105,10 +112,11 @@ void matSub(float *in_matrix1, float *in_matrix2, float* diff, int dim1, int dim
  * sum: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2) {
+void matAdd(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[dim1][dim2], float sum[dim1][dim2]) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) + *(in_matrix2 + i * dim2 + j);
+			//*(sum + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) + *(in_matrix2 + i * dim2 + j);
+			sum[i][j] = in_matrix1[i][j] + in_matrix2[i][j];
 		}
 	}
 }
@@ -119,10 +127,11 @@ void matAdd(float *in_matrix1, float *in_matrix2, float* sum, int dim1, int dim2
  * product: output matrix
  * dim1 dim2: the dimension of the matrix 
  */
-void matTimesScaler(float *in_matrix, float scaler, float* product, int dim1, int dim2) {
+void matTimesScaler(int dim1, int dim2, float in_matrix[dim1][dim2], float scaler, float product[dim1][dim2], ) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(product + i * dim2 + j) = *(in_matrix + i * dim2 + j) * scaler;
+			//*(product + i * dim2 + j) = *(in_matrix + i * dim2 + j) * scaler;
+			product[i][j] = in_matrix[i][j] * scaler;
 		}
 	}
 }
@@ -133,10 +142,11 @@ void matTimesScaler(float *in_matrix, float scaler, float* product, int dim1, in
  * sum: output matrix
  * dim1 dim2: the dimension of the matrix 
  */
-void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim2) {
+void matPlusScaler(int dim1, int dim2, float in_matrix[dim1][dim2], float scaler, float sum[dim1][dim2] ) {
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(sum + i * dim2 + j) = *(in_matrix + i * dim2 + j) + scaler;
+			//*(sum + i * dim2 + j) = *(in_matrix + i * dim2 + j) + scaler;
+			sum[i][j] = in_matrix[i][j] + scaler;
 		}
 	}
 }
@@ -146,15 +156,16 @@ void matPlusScaler(float *in_matrix, float scaler, float* sum, int dim1, int dim
  * out: output matrix
  * dim1 dim2: the dimension of the matrices 
  */
-void matDiv(float *in_matrix1, float *in_matrix2, float* out, int dim1, int dim2){
+void matDiv(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[dim1][dim2], float out[dim1][dim2]){
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			*(out + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) / *(in_matrix2 + i * dim2 + j);
+			//*(out + i * dim2 + j) = *(in_matrix1 + i * dim2 + j) / *(in_matrix2 + i * dim2 + j);
+			out[i][j] = in_matrix1[i][j] / in_matrix2[i][j];
 		}
 	}
 }
 /* find the maximum element in an array */
-float maxOfArray(float *array, int size) {
+float maxOfArray(int size,float array[size]) {
 	float m = array[0];
 	for (int i=1; i<size; i++) {
 		m = (m > array[i])? m : array[i];
@@ -173,20 +184,24 @@ float maxOfArray(float *array, int size) {
  * maxOfMatrix(A,1) will return [7 8 9]
  * maxOfMatrix(A,2) will return [3 6 9]                            
  */
-void maxOfMatrix(float *matrix, int size1, int size2, float *out, int dim) {
+void maxOfMatrix(int size1, int size2, float matrix[dize1][size2], float *out, int dim) {
 	if (dim == 1) {
 		for(int i=0; i<size2; i++) {
-			float m = *(matrix + i);
+			//float m = *(matrix + i);
+			float m = matrix[0][i];
 			for (int j=0; j<size1; j++) {
-				m = (m > *(matrix+j*size2+i))? m : *(matrix+j*size2+i);
+				//m = (m > *(matrix+j*size2+i))? m : *(matrix+j*size2+i);
+				m = (m > matrix[j][i]) ? m : matrix[j][i];
 			}
 		*(out + i) = m;
 		}
 	} else if (dim = 2) {
 		for(int i=0; i<size1; i++) {
-			float m = *(matrix + i*size2);
+			//float m = *(matrix + i*size2);
+			float m = matrix[i][0];
 			for (int j=0; j<size2; j++) {
-				m = (m > *(matrix+i*size2+j))? m : *(matrix+i*size2+j);
+				//m = (m > *(matrix+i*size2+j))? m : *(matrix+i*size2+j);
+				m = (m > matrix[i][j]) ? m : matrix[i][j];
 			}
 		*(out + i) = m;
 		}
@@ -197,10 +212,11 @@ void maxOfMatrix(float *matrix, int size1, int size2, float *out, int dim) {
  * matrix: pointer to the matrix to be printed
  * size1 size2: size of matrix
  */
-void printMatrix(float *matrix, int size1, int size2) {
+void printMatrix( int size1, int size2, float matrix[size1][dize2]) {
 	for (int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++) {
-			printf("%.2f ", *(matrix + i*size2 + j));
+			//printf("%.2f ", *(matrix + i*size2 + j));
+			printf("%.2f ", matrix[i][j]);
 		}
 		printf("\n");
 	}
@@ -213,9 +229,10 @@ void printMatrix(float *matrix, int size1, int size2) {
  * output: an array containing the row
  * rownum: row number
  */
-void getRow(float *in_matrix, int size1,int size2, float *output, int rownum) {
+void getRow(int size1, int size2, float in_matrix[size1][size2], float output[size2], int rownum) {
 	for(int i=0; i<size2; i++) {
-		*(output+i) = *(in_matrix + (rownum-1)*size2 + i);
+		//*(output+i) = *(in_matrix + (rownum-1)*size2 + i);
+		output[i] = in_matrix[rownum-1][i];
 	}
 }
 
@@ -225,9 +242,10 @@ void getRow(float *in_matrix, int size1,int size2, float *output, int rownum) {
  * output: an array containing the column
  * colnum: column number
  */
-void getCol(float *in_matrix, int size1, int size2, float *output, int colnum) {
+void getCol(int size1, int size2, float in_matrix[size1][size2], float output[size1], int colnum) {
 	for(int i=0; i<size1; i++) {
-		*(output+i) = *(in_matrix + i*size2 + (colnum-1));
+		//*(output+i) = *(in_matrix + i*size2 + (colnum-1));
+		output[i] = in_matrix[i][colnum-1];
 	}
 }
 
@@ -235,9 +253,10 @@ void getCol(float *in_matrix, int size1, int size2, float *output, int colnum) {
  * note: this function only returns the index of the 
  * first match element
  */
-int indexOfElement(float *in, int size, float element) {
+int indexOfElement(int size, float in[size], float element) {
 	for (int i=0; i<size; i++) {
-		if (*(in + i) == element)
+		//if (*(in + i) == element)
+		if (in[i] == element)
 			return i;
 	}
 	return -1;
@@ -246,12 +265,13 @@ int indexOfElement(float *in, int size, float element) {
 /* reshapes a matrix into another dimension
  * the number of elements must remain the same
  */
-void reshape(float *in, int insize1, int insize2, float *out, int outsize1, int outsize2) {
+void reshape(int insize1, int insize2, float in[insize1][insize2], int outsize1, int outsize2, float out[outsize1][outsize2]) {
 	if (insize1*insize2 == outsize1*outsize2) {
 		int c = 0;
 		for (int i=0; i<insize2; i++) {
 			for (int j=0; j<insize1; j++) {
-				*(out+(c%outsize1)*outsize2+(c/outsize1)) = *(in+j*insize2+i);
+				//*(out+(c%outsize1)*outsize2+(c/outsize1)) = *(in+j*insize2+i);
+				out[c%outsize][c/outsize1] = in[j][i];
 				c++;
 			}
 		}
