@@ -4,6 +4,7 @@
 #include <math.h>
 #include "utils.c"
 
+#define EPS 1.19e-07
 /*
 function F = nearestDSmax_RE (Y, maxRowSum, maxColSum, totalSum, precision, maxLoops)
 
@@ -80,15 +81,15 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 // Max row sum 
 		// H1 = lambda1 - (Y ./ (F3+eps));
 		float F3eps[m][n];
-		matPlusScaler(F3, eps, F3eps, m, n);
+		matPlusScaler(F3, EPS, F3eps, m, n);
 		float YdivF3eps[m][n]; 
-		matDiv(Y, F3eps, YdivF3eps, m, n)
+		matDiv(Y, F3eps, YdivF3eps, m, n);
 		matSub(lambda1, YdivF3eps, H1, m, n);
 		
 		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
 		float negH1[m][n]; 
 		matTimesScaler(H1, -1, negH1, m, n);
-		float Yt[n][m]
+		float Yt[n][m];
 		transpose(Y, Yt, m, n);
 		float maxRowSumT[1][m];
 		transpose(maxRowSum, maxRowSumT, m, 1);
@@ -96,7 +97,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 
 		// lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
 		float F1eps[m][n];
-		matPlusScaler(F1, eps, F3eps, m, n);
+		matPlusScaler(F1, EPS, F3eps, m, n);
 		float YdivF1eps[m][n]; 
 		matDiv(Y, F1eps, YdivF1eps, m, n);
 		matSub(lambda1, YdivF3eps, lambda1, m, n);
@@ -104,10 +105,8 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 
 // Max col sum 
 		// H2 = lambda2 - (Y ./ (F1+eps));
-		float F1eps[m][n];
-		matPlusScaler(F1, eps, F1eps, m, n);
-		float YdivF1eps[m][n]; 
-		matDiv(Y, F1eps, YdivF1eps, m, n)
+		matPlusScaler(F1, EPS, F1eps, m, n);
+		matDiv(Y, F1eps, YdivF1eps, m, n);
 		matSub(lambda2, YdivF1eps, H2, m, n);
 		
 		// F2 = maxColSumP (Y, -H2, maxColSum, precision);
@@ -117,7 +116,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 
 		// lambda2 = lambda2 - (Y ./ (F1+eps)) + (Y ./ (F2+eps));
 		float F2eps[m][n];
-		matPlusScaler(F2, eps, F2eps, m, n);
+		matPlusScaler(F2, EPS, F2eps, m, n);
 		float YdivF2eps[m][n]; 
 		matDiv(Y, F2eps, YdivF2eps, m, n);
 		matSub(lambda2, YdivF1eps, lambda2, m, n);
@@ -130,7 +129,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		// F3 = reshape( exactTotalSum (Y(:), -H3(:), totalSum, precision), size(Y));
 		float X[m*n];
 		exactTotalSum(Y, negH3, totalSum, precision, X, m*n);
-		reshape(X, Y, F3);
+		reshape(X, 1, m*n ,F3, m, n);
 
 		//lambda3 = lambda3 - (Y ./ (F2+eps)) + (Y ./ (F3+eps));
 		matSub(lambda3, YdivF2eps, lambda3, m, n);
@@ -145,8 +144,8 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 				Fdiff2[i*n + j] = abs(F1[i][j] - F3[i][j]);
 			}
 		}
-		fdMax1 = maxOfArray(Fdiff1, m*n);
-		fdMax2 = maxOfArray(Fdiff2, m*n);
+		float fdMax1 = maxOfArray(Fdiff1, m*n);
+		float fdMax2 = maxOfArray(Fdiff2, m*n);
 		if( fdMax1 < precision && fdMax2 < precision ){
 			break;
 		}
@@ -156,6 +155,7 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 		// F = (F1 + F2 + F3) / 3;
 		matAdd(F1, F2, F, m, n);
 		matAdd(F, F3, F, m, n);
+		float Fdiv[m][n];
 		ones(Fdiv, m, n);
 		matTimesScaler(Fdiv, 3, Fdiv, m, n);
 		matDiv(F, Fdiv, F, m, n);
@@ -164,31 +164,25 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 
 
 //function X = maxColSumP (Y, H, maxColSum, precision)
-void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X){
-
-
+void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X) {
 	//X = unconstrainedP (Y, H);
 	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
 
 	//Xsum = sum(X);
 	for(int i=0; i < Ydim1; i++){
-		for(int j=0; j < Ydim2; j++){
-
+		for(int j=0; j < Ydim2; j++) {
 			Xsum += *(X + i*Ydim2 + j);
-
 		} 
 	}
 
-
-//for i = find(Xsum > maxColSum)
+	//for i = find(Xsum > maxColSum)
 	for(int i=0; i<n; i++){
-		if(Xsum > *(maxColSum + i)){
-
-//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);			
+		if(Xsum > *(maxColSum + i)) {
+			//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
 			exactTotalSum(Y, H, i, *(maxColSum + i), precision, X, n);
-
 		}
 	}
+}
 
 
 
@@ -197,67 +191,61 @@ void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float ep
 	for(int i=0; i<size1; i++) {
 		for(int j=0; j<size2; j++) {
 			//X = Y ./ H;
-
 			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
 
 			//X(find(X < eps)) = eps;
 			if(*(X + i*size2 + j) < eps) {
 				*(X + i*size2 + j) = eps;
 			}
-		}
-	}
+
+		} // end of for j
+	} // end of for i
 } // end of function
 
 
 
 //function x = exactTotalSum (y, h, totalSum, precision)
 void exactTotalSum(float* y, float* h, float totalSum, float precision, float* X, int length) {
-// y and h are vectors, totalSum and precision are scalars
-//X is the return vector and length is the length of y, h, and X
 
+	// y and h are vectors, totalSum and precision are scalars
+	//X is the return vector and length is the length of y, h, and X
 	float totalSumMinus = totalSum - precision;
-	
 	float curAlpha;
 
-//get the minimum of vector h
+	//get the minimum of vector h
 	float min = *(h);
-	for (int i=1; i < length; i++) {
+	for (int i=1; i < length; i++)
 		min = (min < *(h+i))? min : *(h+i);
-	}
 
  	curAlpha = -min + precision;
 
-//stepAlpha = max(10, abs(curAlpha/10));
+	//stepAlpha = max(10, abs(curAlpha/10));
 	float stepAlpha, newAlpha, newSum;
-	if(10 > abs(curAlpha/10)){
+	if(10 > abs(curAlpha/10))
 		stepAlpha = 10;
-	} else{
+	else
 		stepAlpha = abs(curAlpha/10);
-	}
 
-	for(int j=0; j < 50; j++){
-
+	for(int j=0; j < 50; j++) {
 		newAlpha = curAlpha + stepAlpha;
-
 		newSum = 0;
 
-//x = y ./ (h + newAlpha);
-		for(int k=0; k < length; k++){
+		//x = y ./ (h + newAlpha);
+		for(int k=0; k < length; k++) {
 			*(X + k) = *(y + k) / (*(h + k) + newAlpha);
-//newSum = sum(x);
+			//newSum = sum(x);
 			newSum += *(X + k);
 		}
 
-		if(newSum > totalSum){
+		if(newSum > totalSum) {
 			curAlpha = newAlpha;
-		}else{
-			if (newSum < totalSumMinus){
+		} else {
+			if (newSum < totalSumMinus)
 				stepAlpha = stepAlpha / 2;
-			}else{
-				return;
-			}
+			else return;
 		}
-	}
+	
+	} //end of for j
 
 } //end of function
 
