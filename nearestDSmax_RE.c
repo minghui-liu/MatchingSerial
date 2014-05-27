@@ -164,25 +164,38 @@ void nearestDSmax_RE(float* Y, int m, int n, float* maxRowSum, float* maxColSum,
 
 
 //function X = maxColSumP (Y, H, maxColSum, precision)
+
 void maxColSumP(float* Y, int Ydim1, int Ydim2, float* H, float* maxColSum, float precision, float* X) {
 	//X = unconstrainedP (Y, H);
 	unconstrainedP(Y, H, X, Ydim1, Ydim2, precision);
-
+	
 	//Xsum = sum(X);
+	float Xsum[Ydim1];
 	for(int i=0; i < Ydim1; i++){
-		for(int j=0; j < Ydim2; j++) {
-			Xsum += *(X + i*Ydim2 + j);
+		for(int j=0; j < Ydim2; j++){
+			Xsum[i] += *(X + i*Ydim2 + j);
 		} 
 	}
 
-	//for i = find(Xsum > maxColSum)
-	for(int i=0; i<n; i++){
-		if(Xsum > *(maxColSum + i)) {
-			//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
-			exactTotalSum(Y, H, i, *(maxColSum + i), precision, X, n);
+float yCol[Ydim2], hCol[Ydim2], Xcol[Ydim2];
+float Ydim = Ydim1*Ydim2;	
+
+//for i = find(Xsum > maxColSum)
+	for(int i=0; i < Ydim1; i++){
+		if(Xsum[i] > *(maxColSum + i)){
+
+//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
+			getCol(Y, Ydim1, Ydim2, yCol, i);
+			getCol(H, Ydim1, Ydim2, hCol, i);
+
+			exactTotalSum(yCol, hCol, *(maxColSum + i), precision, Xcol, Ydim1);
+
+			for(int j=0; j < Ydim1; j++){
+				*(X + j*Ydim1 + i) = *(Xcol + j);
+			}
 		}
 	}
-}
+} // end of function
 
 
 
@@ -201,7 +214,6 @@ void unconstrainedP(float* Y, float* H, float* X, int size1, int size2, float ep
 		} // end of for j
 	} // end of for i
 } // end of function
-
 
 
 //function x = exactTotalSum (y, h, totalSum, precision)
