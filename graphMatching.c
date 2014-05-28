@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+#include <math.h>
 #include "utils.c"
 #include "hypergraphMatching.c"
 
@@ -28,11 +29,11 @@ void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2]
 
 
 	//Check to make sure the matrices are symmetric	
-	if(isSymmetric(G1,size1) == 0) {
+	if(isSymmetric(size1, G1) == 0) {
 		printf("G1 is not symmetric \n");
 	}
 	
-	if(isSymmetric(G2,size2) == 0) {
+	if(isSymmetric(size2, G2) == 0) {
 		printf("G2 is not symmetric \n");
 	}
 
@@ -42,7 +43,7 @@ void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2]
 	
 	// make Y an all zero matrix
 	zeros(size1, size2, Y);
-	float d[size1][size2], d1[size1][size2], d2[size1][size2], G1_i[size1], G2t_j[size2];
+	float d[size1][size2], d1[size1][size2], d2[size1][size2], G1_i[size1][1], G2t_j[1][size2];
 
 	for(int i=0; i < size1; i++) {
 		for(int j=0; j < size2; j++) {
@@ -65,14 +66,15 @@ void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2]
 			//exp((-d.*d) ./ sigma)
 			for(int k=0; k < size1; k++) {
 				for(int l=0; l < size2; l++) {
-					d[k][l] = exp((-d[k][l] * d[k][l]) / sigma);
+					d[k][l] = (float)exp( (double)((-d[k][l] * d[k][l]) / sigma) );
 				}
 			}
 
 			// Y = Y + ...
 			for(int u=0; u < size1; u++) {
 				for(int v=0; v < size2; v++) {
-					*(Y+u*size2+v) += d[u][v];
+					//*(Y+u*size2+v) += d[u][v];
+					Y[u][v] += d[u][v];
 				}
 			}
 			

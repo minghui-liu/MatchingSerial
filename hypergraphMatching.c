@@ -35,7 +35,7 @@ void soft2hard(int size1, int size2, float soft[size1][size2], int numberOfMatch
 		int r = indexOfElement(size1, maxSoft, dummy);
 
 		// val is the max of soft(r,:), c is the index of val in soft(r,:)
-		float softR[size2];
+		float softR[size2][1];
 		getRow(size1,size2,soft,softR,r);
 		float val = maxOfArray(size2, softR);
 		int c = indexOfElement(size2, softR,val);
@@ -61,7 +61,7 @@ void hypergraphMatching(int size1, int size2, float Y[size1][size2], int numberO
 	// do i need to use maxRowSum[size1][1] here? Seems doesnt make a difference
 	float maxRowSum[size1][1];
 	ones(size1, 1, maxRowSum);
-	float maxColSum[size2];
+	float maxColSum[1][size2];
 	ones(1, size2, maxColSum);
 	
 	nearestDSmax_RE(size1,size2,Y,maxRowSum,maxColSum,numberOfMatches,0.01,1000,Z);

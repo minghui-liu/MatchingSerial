@@ -165,10 +165,10 @@ void matDiv(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[d
 	}
 }
 /* find the maximum element in an array */
-float maxOfArray(int size,float array[size]) {
-	float m = array[0];
+float maxOfArray(int size,float array[size][1]) {
+	float m = array[0][0];
 	for (int i=1; i<size; i++) {
-		m = (m > array[i])? m : array[i];
+		m = (m > array[i][0])? m : array[i][0];
 	}
 	return m;
 }
@@ -229,10 +229,10 @@ void printMatrix( int size1, int size2, float matrix[size1][size2]) {
  * output: an array containing the row
  * rownum: row number
  */
-void getRow(int size1, int size2, float in_matrix[size1][size2], float output[size2], int rownum) {
+void getRow(int size1, int size2, float in_matrix[size1][size2], float output[1][size2], int rownum) {
 	for(int i=0; i<size2; i++) {
 		//*(output+i) = *(in_matrix + (rownum-1)*size2 + i);
-		output[i] = in_matrix[rownum-1][i];
+		output[1][i] = in_matrix[rownum-1][i];
 	}
 }
 
@@ -242,10 +242,10 @@ void getRow(int size1, int size2, float in_matrix[size1][size2], float output[si
  * output: an array containing the column
  * colnum: column number
  */
-void getCol(int size1, int size2, float in_matrix[size1][size2], float output[size1], int colnum) {
+void getCol(int size1, int size2, float in_matrix[size1][size2], float output[size1][1], int colnum) {
 	for(int i=0; i<size1; i++) {
 		//*(output+i) = *(in_matrix + i*size2 + (colnum-1));
-		output[i] = in_matrix[i][colnum-1];
+		output[i][1] = in_matrix[i][colnum-1];
 	}
 }
 
@@ -253,10 +253,10 @@ void getCol(int size1, int size2, float in_matrix[size1][size2], float output[si
  * note: this function only returns the index of the 
  * first match element
  */
-int indexOfElement(int size, float in[size], float element) {
+int indexOfElement(int size, float in[size][1], float element) {
 	for (int i=0; i<size; i++) {
 		//if (*(in + i) == element)
-		if (in[i] == element)
+		if (in[i][0] == element)
 			return i;
 	}
 	return -1;
