@@ -108,25 +108,19 @@ void neighborDistances(int size, double G1[size][2], double neighbors[size][size
 void similarity(int size, int edges, double neighbors1[size][size], double neighbors2[size][size], double similarity[edges][edges]){
 
 	double simScore = 0;
-	for(int i = 0; i < edges; i++){
-		for(int j = 0; j < edges; j++){
-			for(int k = 0; k < size; k++){
-				for(int l = 0; l < size; l++){
-					if(i == j && k == l)
-						continue;
-					else if(i == k && j == l)
-						continue;
-					else{
-						simScore = exp(-(fabs(neighbors1[i][j] - neighbors2[j][k])));
-						//if(simScore > 0.001)
-							//printf("%8.4f\n", simScore);
-						if(simScore > similarity[i][j])
-							similarity[i][j] = simScore;
+//	for(int i = 0; i < edges; i++){
+//		for(int j = 0; j < edges; j++){
+			for(int k = 1; k < size; k++){
+				for(int l = 0; l < k; l++){
+					for(int m = 1; m < size; m++){
+						for(int n = 0; n < m; n++){
+								similarity[k-1 + l][(m-1) + m*n] = exp(-(fabs(neighbors1[k][l] - neighbors2[m][n])));
+						}
 					}
 				}
 			}
-		}
-	}
+//		}
+//	}
 
 }
 
@@ -143,40 +137,41 @@ void zeros(int size1, int size2, double Y[size1][size2]){
 }
 
 void main(){
-	double G1[10][2];
-	for(int i=0; i < 10; i++){
+	int size = 5;
+	double G1[size][2];
+	for(int i=0; i < size; i++){
 		G1[i][0] = randomdouble();
 		G1[i][1] = randomdouble();
 	}
-	printMatrix(10, 2, G1);
-	double G2[10][2];
-	for(int i=0; i < 10; i++){
+	printMatrix(size, 2, G1);
+	double G2[size][2];
+	for(int i=0; i < size; i++){
 		G2[i][0] = G1[i][0];
 		G2[i][1] = G1[i][1];
 	}
-	graphDistortion(10, G1, G2, 0, 0);
-	printMatrix(10, 2, G2);
-	double neighborDist1[10][10], neighborDist2[10][10];
-	neighborDistances(10, G1, neighborDist1);
-	neighborDistances(10, G2, neighborDist2);
+	graphDistortion(size, G1, G2, 0, 0);
+	printMatrix(size, 2, G2);
+	double neighborDist1[size][size], neighborDist2[size][size];
+	neighborDistances(size, G1, neighborDist1);
+	neighborDistances(size, G2, neighborDist2);
 	
 	printf("neighbor Distances 1\n");
-	printMatrix(10, 10, neighborDist1);
+	printMatrix(size, size, neighborDist1);
 
 	printf("neighbor distances 2\n");
-	printMatrix(10, 10, neighborDist2);
-
-	double simMatrix[10][10];
-	zeros(10, 10, simMatrix);
+	printMatrix(size, size, neighborDist2);
 
 	int size2;
 	if(size % 2 == 0)
-		size2 = (size*size)/2 + (size/2);
+		size2 = (size*size)/2 - (size/2);
 	else
-		size2 = (size*size)/2 + (size/2) + 1;
+		size2 = (size*size)/2 - (size/2);
 
-	similarity(10, neighborDist1, neighborDist2, simMatrix);
+	double simMatrix[size2][size2];
+	zeros(size2, size2, simMatrix);
+
+	similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
 	printf("Similarity Scores\n");
-	printMatrix(10, 10, simMatrix);
+	printMatrix(size2, size2, simMatrix);
 
 }
