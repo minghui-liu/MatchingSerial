@@ -23,7 +23,7 @@ void exactTotalSum(int length, float y[length], float h[length], float totalSum,
 	if(10 > fabs(curAlpha/10))
 		stepAlpha = 10;
 	else
-		stepAlpha = fabs(curAlpha/10);
+		stepAlpha = abs(curAlpha/10);
 
 	for(int j=0; j < 50; j++) {
 		newAlpha = curAlpha + stepAlpha;
