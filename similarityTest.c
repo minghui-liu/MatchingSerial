@@ -1,8 +1,9 @@
 /*
- * file: rotate.c
+ * file: similarityTest.c
  *
  * Testing the probablistic graph matching algorithm 
- * by rotating a set of artificial points
+ * by rotating a set of artificial points and then calculating
+ * the similarity score for the edges
  *
  * Kevin Liu & Reid Delaney
  */
