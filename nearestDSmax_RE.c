@@ -28,8 +28,6 @@ Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass
 */
 
 
-
-
 //function x = exactTotalSum (y, h, totalSum, precision)
 void exactTotalSum(int length, float y[length], float h[length], float totalSum, float precision, float X[length]) {
 
@@ -47,10 +45,10 @@ void exactTotalSum(int length, float y[length], float h[length], float totalSum,
 
 	//stepAlpha = max(10, abs(curAlpha/10));
 	float stepAlpha, newAlpha, newSum;
-	if(10 > abs(curAlpha/10))
+	if(10 > fabs(curAlpha/10))
 		stepAlpha = 10;
 	else
-		stepAlpha = abs(curAlpha/10);
+		stepAlpha = fabs(curAlpha/10);
 
 	for(int j=0; j < 50; j++) {
 		newAlpha = curAlpha + stepAlpha;
@@ -101,33 +99,32 @@ void maxColSumP(int dim1, int dim2, float Y[dim1][dim2], float H[dim1][dim2], fl
 	unconstrainedP(dim1, dim2, Y, H, X, precision);
 	
 	//Xsum = sum(X);
-	float Xsum[dim1];
+	float Xsum[dim1][1];
 	for(int i=0; i < dim1; i++){
 		for(int j=0; j < dim2; j++){
-			Xsum[i] += X[i][j];
+			Xsum[i][0] += X[j][i];
 		} 
 	}
 
-float yCol[dim2], hCol[dim2], Xcol[dim2];
-float dim = dim1*dim2;	
+	float yCol[dim2], hCol[dim2], Xcol[dim2];
+	float dim = dim1*dim2;	
 
 //for i = find(Xsum > maxColSum)
 	for(int i=0; i < dim1; i++){
-		if(Xsum[i] > maxColSum[i][1]){
+		if(Xsum[i][0] > maxColSum[i][0]){
 
 //X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
 			getCol(dim1, dim2, Y, yCol, i);
 			getCol(dim1, dim2, H, hCol, i);
 
-			exactTotalSum(dim, yCol, hCol, maxColSum[i][1], precision, Xcol);
-
+			exactTotalSum(dim1, yCol, hCol, maxColSum[i][0], precision, Xcol);
+			
 			for(int j=0; j < dim1; j++){
-				X[i][j] = Xcol[j];
+				X[j][i] = Xcol[j];
 			}
 		}
 	}
 } // end of function
-
 
 
 void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float maxColSum[n][1], float totalSum, float precision, float maxLoops, float F[m][n]){
@@ -231,7 +228,6 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 
 		// F3 = reshape( exactTotalSum (Y(:), -H3(:), totalSum, precision), size(Y));
 		float X[m*n];
-
 		float negH3[m*n];
 		float Yv[m*n];
 
@@ -243,9 +239,9 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 		}
 
 		exactTotalSum(m*n, Yv, negH3, totalSum, precision, X);
-	
+
 		float Xp[m*n][1];
-		for(int i=0; i<n; i++){ 
+		for(int i=0; i<n; i++){
 			for(int j=0; j < m; j++){
 				Xp[n*i +j][0] = X[n*i + j];
 			}
