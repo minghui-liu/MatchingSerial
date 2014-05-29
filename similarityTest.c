@@ -15,18 +15,11 @@
 
 #define PI 3.14159265
 
-/*
-double randomdouble();
-double randomdoubleAngle();
-void pointDistort(int size; double G1[][]; double G2[][]; double centerX; double centerY);
-void rotate(int size; double G1[][]; double G2[][]; double centerX; double centerY); 
-*/
+//function returns a random float value in the interval [0, 2PI]
+float randomfloatAngle(){
 
-//function returns a random double value in the interval [0, 2PI]
-double randomdoubleAngle(){
-
-	//generate random double between 0 and 1
-	double r = (double)rand()/(double)RAND_MAX;
+	//generate random float between 0 and 1
+	float r = (float)rand()/(float)RAND_MAX;
 
 	//scale to the 0 to 2PI range
 	r *= (2*PI);
@@ -34,11 +27,11 @@ double randomdoubleAngle(){
 	return r;
 } //end of function
 
-//function returns a random double value in the interval [0,1]
-double randomdouble(){
+//function returns a random float value in the interval [0,1]
+float randomfloat(){
 
-	//generate random double between 0 and 1
-	double r = (double)rand()/(double)RAND_MAX;
+	//generate random float between 0 and 1
+	float r = (float)rand()/(float)RAND_MAX;
 
 	if(rand()%2 == 0)
 		return r;
@@ -47,36 +40,36 @@ double randomdouble(){
 } //end of function
 
 //function takes in a set of points, rotates them and then returns the new set
-void rotate(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
+void rotate(int size, float G1[size][2], float G2[size][2], float centerX, float centerY){
 
-	double theta = randomdoubleAngle();
+	float theta = randomfloatAngle();
 	for(int i=0; i < size; i++){
-		G2[i][0] = cos(theta)*(G1[i][0] - centerX) - sin(theta)*(G1[i][1] - centerY) + centerX;
-		G2[i][1] = sin(theta)*(G1[i][0] - centerX) + cos(theta)*(G1[i][1] - centerY) + centerY;
+		G2[i][0] = ((float)cos((double)theta))*(G1[i][0] - centerX) - ((float)sin((double)theta))*(G1[i][1] - centerY) + centerX;
+		G2[i][1] = ((float)sin((double)theta))*(G1[i][0] - centerX) + ((float)cos((double)theta))*(G1[i][1] - centerY) + centerY;
 	}
 } //end of function
 
-void pointDistort(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
+void translate(int size, float G1[size][2], float G2[size][2], float centerX, float centerY){
 
-	double distortionX;
-	double distortionY;
+	float distortionX;
+	float distortionY;
+	distortionX = randomfloat();
+	distortionY = randomfloat();
 	for(int i=0; i < size; i++){
-		distortionX = randomdouble()/10;
-		distortionY = randomdouble()/10;
 		G2[i][0] = distortionX + G1[i][0];
 		G2[i][1] = distortionY + G1[i][1];
 	}
 
 } //end of function
 
-void graphDistortion(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
+void graphDistortion(int size, float G1[size][2], float G2[size][2], float centerX, float centerY){
 
 	rotate(size, G1, G2, centerX, centerY);
-	pointDistort(size, G2, G2, centerX, centerY);
+	translate(size, G2, G2, centerX, centerY);
 
 } //end of function
 
-void printMatrix( int size1, int size2, double matrix[size1][size2]) {
+void printMatrix( int size1, int size2, float matrix[size1][size2]) {
 	for (int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++) {
 			//printf("%.2f ", *(matrix + i*size2 + j));
@@ -88,9 +81,9 @@ void printMatrix( int size1, int size2, double matrix[size1][size2]) {
 } //end of function
 
 //create a matrix of distances between nodes
-void neighborDistances(int size, double G1[size][2], double neighbors[size][size]){
+void neighborDistances(int size, float G1[size][2], float neighbors[size][size]){
 
-	double distance = 0;
+	float distance = 0;
 	for(int i = 0; i < size; i++){
 		for(int j = 0; j < size; j++){
 			if(i == j)
@@ -105,9 +98,9 @@ void neighborDistances(int size, double G1[size][2], double neighbors[size][size
 }
 
 //similarity function
-void similarity(int size, int edges, double neighbors1[size][size], double neighbors2[size][size], double similarity[edges][edges]){
+void similarity(int size, int edges, float neighbors1[size][size], float neighbors2[size][size], float similarity[edges][edges]){
 
-	double simScore = 0;
+	float simScore = 0;
 	int j = 0;
 	int i = 0;
 
@@ -128,7 +121,7 @@ void similarity(int size, int edges, double neighbors1[size][size], double neigh
 /* make Y an all zero matrix
  * size1 and size2 are the size of Y
  */
-void zeros(int size1, int size2, double Y[size1][size2]){
+void zeros(int size1, int size2, float Y[size1][size2]){
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
 			//*(Y + (i*size2 + j) ) = 0;
@@ -139,20 +132,20 @@ void zeros(int size1, int size2, double Y[size1][size2]){
 
 void main(){
 	int size = 5;
-	double G1[size][2];
+	float G1[size][2];
 	for(int i=0; i < size; i++){
-		G1[i][0] = randomdouble();
-		G1[i][1] = randomdouble();
+		G1[i][0] = randomfloat();
+		G1[i][1] = randomfloat();
 	}
 	printMatrix(size, 2, G1);
-	double G2[size][2];
+	float G2[size][2];
 	for(int i=0; i < size; i++){
 		G2[i][0] = G1[i][0];
 		G2[i][1] = G1[i][1];
 	}
 	graphDistortion(size, G1, G2, 0, 0);
 	printMatrix(size, 2, G2);
-	double neighborDist1[size][size], neighborDist2[size][size];
+	float neighborDist1[size][size], neighborDist2[size][size];
 	neighborDistances(size, G1, neighborDist1);
 	neighborDistances(size, G2, neighborDist2);
 	
@@ -166,7 +159,7 @@ void main(){
 	size2 = (size*size)/2 - (size/2);
 
 
-	double simMatrix[size2][size2];
+	float simMatrix[size2][size2];
 	zeros(size2, size2, simMatrix);
 
 	similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
