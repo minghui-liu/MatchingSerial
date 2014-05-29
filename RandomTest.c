@@ -12,30 +12,26 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "graphMatching.c"
+#include "utils.c"
 
 #define PI 3.14159265
 #define TEST_SIZE 5
 
-/*
-double randomdouble();
-double randomdoubleAngle();
-void pointDistort(int size; double G1[][]; double G2[][]; double centerX; double centerY);
-void rotate(int size; double G1[][]; double G2[][]; double centerX; double centerY);
-*/
 
-//function returns a random double value in the interval [0, 2PI]
-double randomdoubleAngle(){
-  //generate random double between 0 and 1
-  double r = (double)rand()/(double)RAND_MAX;
+//function returns a random float value in the interval [0, 2PI]
+float randomfloatAngle(){
+  //generate random float between 0 and 1
+  float r = (float)rand()/(float)RAND_MAX;
   //scale to the 0 to 2PI range
   r *= (2*PI);
   return r;
 } //end of function
 
-//function returns a random double value in the interval [0,1]
-double randomdouble(){
-  //generate random double between 0 and 1
-  double r = (double)rand()/(double)RAND_MAX;
+//function returns a random float value in the interval [0,1]
+float randomfloat(){
+  //generate random float between 0 and 1
+  float r = (float)rand()/(float)RAND_MAX;
   
   if(rand()%2 == 0)
     return r;
@@ -44,50 +40,41 @@ double randomdouble(){
 } //end of function
 
 //function takes in a set of points, rotates them and then returns the new set
-void rotate(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
-  double theta = randomdoubleAngle();
+void rotate(int size, float V1[size][2], float V2[size][2], float centerX, float centerY){
+  float theta = randomfloatAngle();
   for(int i=0; i < size; i++){
-    G2[i][0] = cos(theta)*(G1[i][0] - centerX) - sin(theta)*(G1[i][1] - centerY) + centerX;
-    G2[i][1] = sin(theta)*(G1[i][0] - centerX) + cos(theta)*(G1[i][1] - centerY) + centerY;
+    V2[i][0] = cos(theta)*(V1[i][0] - centerX) - sin(theta)*(V1[i][1] - centerY) + centerX;
+    V2[i][1] = sin(theta)*(V1[i][0] - centerX) + cos(theta)*(V1[i][1] - centerY) + centerY;
   }
 } //end of function
 
-void pointDistort(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
-  double distortionX;
-  double distortionY;
+void pointDistort(int size, float V1[size][2], float V2[size][2], float centerX, float centerY){
+  float distortionX;
+  float distortionY;
   for(int i=0; i < size; i++){
-    distortionX = randomdouble()/10;
-    distortionY = randomdouble()/10;
-    G2[i][0] = distortionX + G1[i][0];
-    G2[i][1] = distortionY + G1[i][1];
+    distortionX = randomfloat()/10;
+    distortionY = randomfloat()/10;
+    V2[i][0] = distortionX + V1[i][0];
+    V2[i][1] = distortionY + V1[i][1];
   }
 } //end of function
 
-void graphDistortion(int size, double G1[size][2], double G2[size][2], double centerX, double centerY) {
-  rotate(size, G1, G2, centerX, centerY);
-  pointDistort(size, G2, G2, centerX, centerY);
+void graphDistortion(int size, float V1[size][2], float V2[size][2], float centerX, float centerY) {
+  rotate(size, V1, V2, centerX, centerY);
+  pointDistort(size, V2, V2, centerX, centerY);
 } //end of function
 
-void printMatrix( int size1, int size2, double matrix[size1][size2]) {
-  for (int i=0; i<size1; i++){
-    for(int j=0; j<size2; j++) {
-      printf("%6.2f ", matrix[i][j]);
-    }
-    printf("\n");
-  }
-  printf("\n");
-} //end of function
 
 //create a matrix of distances between nodes
-void neighborDistances(int size, double G1[size][2], double neighbors[size][size]){
+void neighborDistances(int size, float V1[size][2], float neighbors[size][size]){
 
-  double distance = 0;
+  float distance = 0;
   for(int i = 0; i < size; i++){
     for(int j = 0; j < size; j++){
       if(i == j)
         neighbors[i][j] = 0;
       else {
-        distance = sqrt((G1[i][0] - G1[j][0])*(G1[i][0] - G1[j][0]) + (G1[i][1] - G1[j][1])*(G1[i][1] - G1[j][1]));
+        distance = sqrt((V1[i][0] - V1[j][0])*(V1[i][0] - V1[j][0]) + (V1[i][1] - V1[j][1])*(V1[i][1] - V1[j][1]));
         neighbors[i][j] = distance;
       }
     }
@@ -96,8 +83,8 @@ void neighborDistances(int size, double G1[size][2], double neighbors[size][size
 }
 
 //similarity function
-void similarity(int size, int edges, double neighbors1[size][size], double neighbors2[size][size], double similarity[edges][edges]){
-  double simScore = 0;
+void similarity(int size, int edges, float neighbors1[size][size], float neighbors2[size][size], float similarity[edges][edges]){
+  float simScore = 0;
   int j = 0;
   int i = 0;
   
@@ -115,30 +102,18 @@ void similarity(int size, int edges, double neighbors1[size][size], double neigh
 
 } // end oof function
 
-/* make Y an all zero matrix
-* size1 and size2 are the size of Y
-*/
-void zeros(int size1, int size2, double Y[size1][size2]) {
-  for(int i=0; i<size1; i++){
-    for(int j=0; j<size2; j++){
-      //*(Y + (i*size2 + j) ) = 0;
-      Y[i][j] = 0;
-    }
-  }
-}
-
 void main(){
   int size = TEST_SIZE;
-  double V1[size][2], G2[size][2];
+  float V1[size][2], V2[size][2];
   for(int i=0; i < size; i++){
-    V2[i][0] = V1[i][0] = V1[i][0] = randomdouble();
-    V2[i][1] = V1[i][1] = V1[i][1] = randomdouble();
+    V2[i][0] = V1[i][0] = V1[i][0] = randomfloat();
+    V2[i][1] = V1[i][1] = V1[i][1] = randomfloat();
   }
   printMatrix(size, 2, V1);
 
   graphDistortion(size, V1, V2, 0, 0);
   printMatrix(size, 2, V2);
-  double neighborDist1[size][size], neighborDist2[size][size];
+  float neighborDist1[size][size], neighborDist2[size][size];
   neighborDistances(size, V1, neighborDist1);
   neighborDistances(size, V2, neighborDist2);
   
@@ -152,7 +127,7 @@ void main(){
   size2 = (size*size)/2 - (size/2);
   
   
-  double simMatrix[size2][size2];
+  float simMatrix[size2][size2];
   zeros(size2, size2, simMatrix);
   
   similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
@@ -162,7 +137,7 @@ void main(){
   float X[size][size];
   float Z[size][size];
   float Y[size][size];
-  graphMatching(size,neighborDis1,size,neighborDist2,1,size,X,Z,Y);
+  graphMatching(size,neighborDist1,size,neighborDist2,1,size,X,Z,Y);
   
   printf("X(hard):\n");
   printMatrix(size, size, X);
