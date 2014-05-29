@@ -14,6 +14,7 @@
 #include <math.h>
 
 #define PI 3.14159265
+#define TEST_SIZE 5
 
 /*
 double randomdouble();
@@ -127,23 +128,19 @@ void zeros(int size1, int size2, double Y[size1][size2]) {
 }
 
 void main(){
-  int size = 5;
-  double G1[size][2];
+  int size = TEST_SIZE;
+  double V1[size][2], G2[size][2];
   for(int i=0; i < size; i++){
-    G1[i][0] = randomdouble();
-    G1[i][1] = randomdouble();
+    V2[i][0] = V1[i][0] = V1[i][0] = randomdouble();
+    V2[i][1] = V1[i][1] = V1[i][1] = randomdouble();
   }
-  printMatrix(size, 2, G1);
-  double G2[size][2];
-  for(int i=0; i < size; i++){
-    G2[i][0] = G1[i][0];
-    G2[i][1] = G1[i][1];
-  }
-  graphDistortion(size, G1, G2, 0, 0);
-  printMatrix(size, 2, G2);
+  printMatrix(size, 2, V1);
+
+  graphDistortion(size, V1, V2, 0, 0);
+  printMatrix(size, 2, V2);
   double neighborDist1[size][size], neighborDist2[size][size];
-  neighborDistances(size, G1, neighborDist1);
-  neighborDistances(size, G2, neighborDist2);
+  neighborDistances(size, V1, neighborDist1);
+  neighborDistances(size, V2, neighborDist2);
   
   printf("neighbor Distances 1\n");
   printMatrix(size, size, neighborDist1);
@@ -161,4 +158,17 @@ void main(){
   similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
   printf("Similarity Scores\n");
   printMatrix(size2, size2, simMatrix);
+  
+  float X[size][size];
+  float Z[size][size];
+  float Y[size][size];
+  graphMatching(size,neighborDis1,size,neighborDist2,1,size,X,Z,Y);
+  
+  printf("X(hard):\n");
+  printMatrix(size, size, X);
+  printf("Z(soft):\n");
+  printMatrix(size, size, Z);
+  printf("Y(debug):\n");
+  printMatrix(size, size, Y);
+ 
 }
