@@ -108,19 +108,20 @@ void neighborDistances(int size, double G1[size][2], double neighbors[size][size
 void similarity(int size, int edges, double neighbors1[size][size], double neighbors2[size][size], double similarity[edges][edges]){
 
 	double simScore = 0;
-//	for(int i = 0; i < edges; i++){
-//		for(int j = 0; j < edges; j++){
-			for(int k = 1; k < size; k++){
-				for(int l = 0; l < k; l++){
-					for(int m = 1; m < size; m++){
-						for(int n = 0; n < m; n++){
-								similarity[k-1 + l][(m-1) + m*n] = exp(-(fabs(neighbors1[k][l] - neighbors2[m][n])));
-						}
-					}
+	int j = 0;
+	int i = 0;
+
+	for(int k = 1; k < size; k++){
+		for(int l = 0; l < k; l++){
+			for(int m = 1; m < size; m++){
+				for(int n = 0; n < m; n++){
+						similarity[i][j] = exp(-(fabs(neighbors1[k][l] - neighbors2[m][n])));
+						j = (j+1) % edges;
 				}
 			}
-//		}
-//	}
+			i = (i+1);
+		}
+	}
 
 }
 
