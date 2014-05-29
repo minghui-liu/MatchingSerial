@@ -12,8 +12,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "graphMatching.c"
+#include "utils.c"
 
 #define PI 3.14159265
+#define TEST_SIZE 50
 
 //function returns a random float value in the interval [-1,1]
 float randomfloat(){
@@ -69,17 +72,6 @@ void graphDistortion(int size, float G1[size][2], float G2[size][2], float cente
 
 } //end of function
 
-void printMatrix( int size1, int size2, float matrix[size1][size2]) {
-	for (int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++) {
-			//printf("%.2f ", *(matrix + i*size2 + j));
-			printf("%6.2f ", matrix[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-} //end of function
-
 //create a matrix of distances between nodes
 void neighborDistances(int size, float G1[size][2], float neighbors[size][size], float adjacency[size][size]){
 
@@ -87,13 +79,15 @@ void neighborDistances(int size, float G1[size][2], float neighbors[size][size],
 	for(int i = 0; i < size; i++){
 		for(int j = 0; j < size; j++){
 			if(i == j)
-				neighbors[i][j] = -INFINITY;
+				//neighbors[i][j] = -INFINITY;
+				neighbors[i][j] = 0;
 			else if (adjacency[i][j] == 1){
 				distance = sqrt((G1[i][0] - G1[j][0])*(G1[i][0] - G1[j][0]) + (G1[i][1] - G1[j][1])*(G1[i][1] - G1[j][1]));
 				neighbors[i][j] = distance;
 			}
 			else
-				neighbors[i][j] = -INFINITY;
+				//neighbors[i][j] = -INFINITY;
+				neighbors[i][j] = 0;
 		}
 	}
 
@@ -110,7 +104,7 @@ void similarity(int size, int size2, int edges, float neighbors1[size][size], fl
 		for(int l = 0; l < k; l++){
 			for(int m = 1; m < size; m++){
 				for(int n = 0; n < m; n++){
-					if(neighbors1[k][l] == -INFINITY || neighbors2[m][n] == -INFINITY)
+					if(neighbors1[k][l] == 0 || neighbors2[m][n] == 0)
 						similarity[i][j] = 0;
 					else
 						similarity[i][j] = exp(-(fabs(neighbors1[k][l] - neighbors2[m][n])));
@@ -123,17 +117,6 @@ void similarity(int size, int size2, int edges, float neighbors1[size][size], fl
 
 }
 
-/* make Y an all zero matrix
- * size1 and size2 are the size of Y
- */
-void zeros(int size1, int size2, float Y[size1][size2]){
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-			//*(Y + (i*size2 + j) ) = 0;
-			Y[i][j] = 0;
-		}
-	}
-}
 
 void makeAdjacency(int size, float adjacent[size][size], int edges){
 
@@ -151,7 +134,6 @@ void makeAdjacency(int size, float adjacent[size][size], int edges){
 			for(int j = 0; j < i; j++){
 
 				temp = fabs(randomfloat());
-				printf("temp is %f\n", temp);
 
 				if(temp < p){
 					if(adjacent[i][j] != 1){
@@ -177,13 +159,13 @@ void main(){
 	srand(time(0));
 
 //create random set of points
-	int size = 5;
+	int size = TEST_SIZE;
 	float G1[size][2];
 	for(int i=0; i < size; i++){
 		G1[i][0] = randomfloat();
 		G1[i][1] = randomfloat();
 	}
-	printMatrix(size, 2, G1);
+	//printMatrix(size, 2, G1);
 
 //create adjacency matrix to determine where edges exist
 	float adjacent[size][size];
@@ -191,8 +173,8 @@ void main(){
 	int edges = 6;
 	makeAdjacency(size, adjacent, edges);
 
-	printf("Adjacency Matrix\n");
-	printMatrix(size, size, adjacent);
+	//printf("Adjacency Matrix\n");
+	//printMatrix(size, size, adjacent);
 
 
 //copy original set of points for distortion
@@ -204,18 +186,18 @@ void main(){
 
 //distort the graph for testing purposes
 	graphDistortion(size, G1, G2, 0, 0);
-	printMatrix(size, 2, G2);
+	//printMatrix(size, 2, G2);
 
 //calculate the distances to each neighbor
 	float neighborDist1[size][size], neighborDist2[size][size];
 	neighborDistances(size, G1, neighborDist1, adjacent);
 	neighborDistances(size, G2, neighborDist2, adjacent);
 	
-	printf("neighbor Distances 1\n");
-	printMatrix(size, size, neighborDist1);
+	//printf("neighbor Distances 1\n");
+	//printMatrix(size, size, neighborDist1);
 
-	printf("neighbor distances 2\n");
-	printMatrix(size, size, neighborDist2);
+	//printf("neighbor distances 2\n");
+	//printMatrix(size, size, neighborDist2);
 
 	int size2;
 	size2 = (size*size)/2 - (size/2);
@@ -226,8 +208,20 @@ void main(){
 
 //check to see if the graphs are the same
 	similarity(size, size2, edges, neighborDist1, neighborDist2, simMatrix);
-	printf("Similarity Scores\n");
-	printMatrix(size2, size2, simMatrix);
+	//printf("Similarity Scores\n");
+	//printMatrix(size2, size2, simMatrix);
+	
+	  float X[size][size];
+	  float Z[size][size];
+	  float Y[size][size];
+	  graphMatching(size,neighborDist1,size,neighborDist2,1,size,X,Z,Y);
+	  
+	  printf("X(hard):\n");
+	  printMatrix(size, size, X);
+	  printf("Z(soft):\n");
+	  printMatrix(size, size, Z);
+	  printf("Y(debug):\n");
+	  printMatrix(size, size, Y);
 
 
 
