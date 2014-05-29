@@ -13,7 +13,7 @@
 /* transpose a size1*size2 matrix
  * returns a pointer to the new matrix
  */
-void transpose(int size1, int size2, float in_matrix[size1][size2], float out_matrix[size1][size2]) {
+void transpose(int size1, int size2, float in_matrix[size1][size2], float out_matrix[size2][size1]) {
 	for(int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++){
 			//*(out_matrix + j*size1 + i) = *(in_matrix + i*size2 + j);
@@ -84,7 +84,7 @@ int isSymmetric_eps(int size, double eps, float in_matrix[size][size]) {
 }
 
 /* creates a m*n tiling of a matrix */
-void repmat(int size1, int size2, float in_matrix[size1][size2], int m, int n, float out_matrix[m][n]) {
+void repmat(int size1, int size2, float in_matrix[size1][size2], int m, int n, float out_matrix[size1*m][size2*n]) {
 	for(int i=0; i<size1*m; i++) {
 		for(int j=0; j<size2*n; j++) {
 			//*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
@@ -167,7 +167,7 @@ void matDiv(int dim1, int dim2, float in_matrix1[dim1][dim2], float in_matrix2[d
 /* find the maximum element in an array */
 float maxOfArray(int size,float array[size][1]) {
 	float m = array[0][0];
-	for (int i=1; i<size; i++) {
+	for (int i=0; i<size; i++) {
 		m = (m > array[i][0])? m : array[i][0];
 	}
 	return m;
@@ -216,7 +216,7 @@ void printMatrix( int size1, int size2, float matrix[size1][size2]) {
 	for (int i=0; i<size1; i++){
 		for(int j=0; j<size2; j++) {
 			//printf("%.2f ", *(matrix + i*size2 + j));
-			printf("%.2f ", matrix[i][j]);
+			printf("%.4f ", matrix[i][j]);
 		}
 		printf("\n");
 	}
@@ -232,7 +232,7 @@ void printMatrix( int size1, int size2, float matrix[size1][size2]) {
 void getRow(int size1, int size2, float in_matrix[size1][size2], float output[1][size2], int rownum) {
 	for(int i=0; i<size2; i++) {
 		//*(output+i) = *(in_matrix + (rownum-1)*size2 + i);
-		output[1][i] = in_matrix[rownum-1][i];
+		output[0][i] = in_matrix[rownum][i];
 	}
 }
 
@@ -245,7 +245,7 @@ void getRow(int size1, int size2, float in_matrix[size1][size2], float output[1]
 void getCol(int size1, int size2, float in_matrix[size1][size2], float output[size1][1], int colnum) {
 	for(int i=0; i<size1; i++) {
 		//*(output+i) = *(in_matrix + i*size2 + (colnum-1));
-		output[i][1] = in_matrix[i][colnum-1];
+		output[i][0] = in_matrix[i][colnum];
 	}
 }
 

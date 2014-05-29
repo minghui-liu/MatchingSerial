@@ -4,7 +4,7 @@
 #include <math.h>
 #include "utils.c"
 
-#define EPS 1e-5
+#define EPS 2.2204e-16
 /*
 function F = nearestDSmax_RE (Y, maxRowSum, maxColSum, totalSum, precision, maxLoops)
 
@@ -75,7 +75,7 @@ void exactTotalSum(int length, float y[length][1], float h[length][1], float tot
 
 
 
-void unconstrainedP(int size1, int size2, float Y[size1][size2], float H[size1][size2], float X[size1][size2], float eps){
+void unconstrainedP(int size1, int size2, float Y[size1][size2], float H[size1][size2], float X[size1][size2]){
 	//function X = unconstrainedP (Y, H)
 	for(int i=0; i<size1; i++) {
 		for(int j=0; j<size2; j++) {
@@ -83,8 +83,8 @@ void unconstrainedP(int size1, int size2, float Y[size1][size2], float H[size1][
 			X[i][j] = Y[i][j] / H[i][j];
 
 			//X(find(X < eps)) = eps;
-			if(X[i][j] < eps) {
-				X[i][j] = eps;
+			if(X[i][j] < EPS) {
+				X[i][j] = EPS;
 			}
 
 		} // end of for j
@@ -94,36 +94,36 @@ void unconstrainedP(int size1, int size2, float Y[size1][size2], float H[size1][
 
 
 //function X = maxColSumP (Y, H, maxColSum, precision)
-void maxColSumP(int dim1, int dim2, float Y[dim1][dim2], float H[dim1][dim2], float maxColSum[dim1][1], float precision, float X[dim1][dim2]) {
+void maxColSumP(int dim1, int dim2, float Y[dim1][dim2], float H[dim1][dim2], float maxColSum[1][dim2], float precision, float X[dim1][dim2]) {
 	//X = unconstrainedP (Y, H);
-	unconstrainedP(dim1, dim2, Y, H, X, precision);
+	unconstrainedP(dim1, dim2, Y, H, X);
 	
 	//Xsum = sum(X);
-	float Xsum[dim1][1];
-	for(int i=0; i < dim1; i++){
-		for(int j=0; j < dim2; j++){
-			Xsum[i][0] += X[j][i];
+	float Xsum[1][dim2];
+	for(int i=0; i < dim2; i++){
+		for(int j=0; j < dim1; j++){
+			Xsum[0][i] += X[j][i];
 		} 
 	}
+	
+	float yCol[dim1][1], hCol[dim1][1], Xcol[dim1];
+	//float dim = dim1*dim2;	
 
 
-	float yCol[dim2][1], hCol[dim2][1], Xcol[dim2];
-	float dim = dim1*dim2;	
+	//for i = find(Xsum > maxColSum)
+	for(int i=0; i < dim2; i++) {
+		if(Xsum[0][i] > maxColSum[0][i]) {
 
-
-//for i = find(Xsum > maxColSum)
-	for(int i=0; i < dim1; i++){
-		if(Xsum[i][0] > maxColSum[i][0]){
-
-//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
+			//X(:,i) = exactTotalSum (Y(:,i), H(:,i), maxColSum(i), precision);
 			getCol(dim1, dim2, Y, yCol, i);
 			getCol(dim1, dim2, H, hCol, i);
 
-			exactTotalSum(dim1, yCol, hCol, maxColSum[i][0], precision, Xcol);
+			exactTotalSum(dim1, yCol, hCol, maxColSum[0][i], precision, Xcol);
 			
 			for(int j=0; j < dim1; j++){
 				X[j][i] = Xcol[j];
 			}
+
 		}
 	}
 } // end of function
@@ -152,7 +152,7 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 	float F1[m][n];
 	float F2[m][n];
 	float F3[m][n];
-
+	
 	//sum(Y(:))
 	float Ysum = 0;
 	for(int i=0; i < m; i++){
@@ -179,27 +179,35 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 
 //for t = 1 : maxLoops
 	for(int t=0; t < maxLoops; t++) {
-
 // Max row sum 
 		// H1 = lambda1 - (Y ./ (F3+eps));
 		float F3eps[m][n];
 		matPlusScaler(m, n, F3, EPS, F3eps);
-		float YdivF3eps[m][n]; 
+		float YdivF3eps[m][n];
 		matDiv(m, n, Y, F3eps, YdivF3eps);
-		matSub( m, n, lambda1, YdivF3eps, H1);
+		matSub(m, n, lambda1, YdivF3eps, H1);
 		
 		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
-		float negH1[m][n]; 
-		matTimesScaler(m, n, H1, -1, negH1);
+		//-H1'
+		float H1t[n][m];
+		transpose(m, n, H1, H1t);
+		float negH1t[n][m]; 
+		matTimesScaler(n, m, H1t, -1, negH1t);
+		//Y'
 		float Yt[n][m];
 		transpose(m, n, Y, Yt);
-		float maxRowSumT[m][1];
-		transpose( m, 1, maxRowSum, maxRowSumT);
-		maxColSumP(n, m, Yt, negH1, maxRowSumT, precision, F1);
+		//maxRowSum'
+		float maxRowSumT[1][m];
+		transpose(m, 1, maxRowSum, maxRowSumT);
+		//maxColSumP (Y', -H1', maxRowSum', precision)'
+		float F1t[n][m];
+		maxColSumP(n, m, Yt, negH1t, maxRowSumT, precision, F1t);
+		//F1
+		transpose(n,m,F1t,F1);
 
 		// lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
 		float F1eps[m][n];
-		matPlusScaler( m, n, F1, EPS, F3eps);
+		matPlusScaler(m, n, F1, EPS, F1eps);
 		float YdivF1eps[m][n]; 
 		matDiv(m, n, Y, F1eps, YdivF1eps);
 		matSub(m, n, lambda1, YdivF3eps, lambda1);
@@ -210,12 +218,12 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 		matPlusScaler( m, n, F1, EPS, F1eps);
 		matDiv(m, n, Y, F1eps, YdivF1eps);
 		matSub(m, n, lambda2, YdivF1eps, H2);
-		
+
 		// F2 = maxColSumP (Y, -H2, maxColSum, precision);
 		float negH2[m][n];
 		matTimesScaler( m, n, H2, -1, negH2);
 		maxColSumP(n, m, Y, negH2, maxColSum, precision, F2);
-
+	
 		// lambda2 = lambda2 - (Y ./ (F1+eps)) + (Y ./ (F2+eps));
 		float F2eps[m][n];
 		matPlusScaler( m, n, F2, EPS, F2eps);
@@ -226,15 +234,12 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 
 // Total sum
 		// H3 = lambda3 - (Y ./ (F2 + eps));
-		matSub(m, n, lambda3, YdivF1eps, H3);
-
+		matSub(m, n, lambda3, YdivF2eps, H3);
+		
 		// F3 = reshape( exactTotalSum (Y(:), -H3(:), totalSum, precision), size(Y));
 		float X[m*n];
-
-
 		float negH3[m*n][1];
 		float Yv[m*n][1];
-
 
 		for(int i=0; i<n; i++){ 
 			for(int j=0; j < m; j++){
@@ -253,35 +258,44 @@ void nearestDSmax_RE(int m, int n, float Y[m][n], float maxRowSum[m][1], float m
 		}
 
 		reshape(m*n, 1, Xp, m, n, F3);
-
+		
 		//lambda3 = lambda3 - (Y ./ (F2+eps)) + (Y ./ (F3+eps));
+		matPlusScaler(m, n, F3, EPS, F3eps);
+		matDiv(m, n, Y, F3eps, YdivF3eps);
 		matSub(m, n, lambda3, YdivF2eps, lambda3);
-		matAdd(m, n, lambda3, YdivF3eps, lambda3);
-
-
-//if (max(abs(F1(:) - F2(:))) < precision && max(abs(F1(:) - F3(:))) < precision)
-		float Fdiff1[m*n][1], Fdiff2[m*n][1];
+		matAdd(m, n, lambda3, YdivF3eps, lambda3);	
+		
+		//if (max(abs(F1(:) - F2(:))) < precision && max(abs(F1(:) - F3(:))) < precision)
+		float Fdiff1[m][n], Fdiff2[m][n];
 		for(int i=0; i < m; i++){
 			for(int j=0; j < n; j++){
-				Fdiff1[i*n + j][0] = abs(F1[i][j] - F2[i][j]);
-				Fdiff2[i*n + j][0] = abs(F1[i][j] - F3[i][j]);
+				Fdiff1[i][j] = fabs(F1[i][j] - F2[i][j]);
+				Fdiff2[i][j] = fabs(F1[i][j] - F3[i][j]);
 			}
 		}
-		float fdMax1 = maxOfArray(m*n, Fdiff1);
-		float fdMax2 = maxOfArray(m*n, Fdiff2);
+		
+		float fdMax1 = Fdiff1[0][0];
+		float fdMax2 = Fdiff2[0][0];
+		for(int k=0; k < m; k++){
+			for(int l=0; l < n; l++){
+				fdMax1 = (Fdiff1[k][l] > fdMax1) ? Fdiff1[k][l] : fdMax1;
+				fdMax2 = (Fdiff2[k][l] > fdMax2) ? Fdiff2[k][l] : fdMax2;
+			}
+		}
+
 		if(fdMax1 < precision && fdMax2 < precision){
 			break;
 		}
 
 	} // end of t for loop
 
-		// F = (F1 + F2 + F3) / 3;
-		matAdd(m, n, F1, F2, F);
-		matAdd(m, n, F, F3, F);
-		float Fdiv[m][n];
-		ones(m, n, Fdiv);
-		matTimesScaler(m, n, Fdiv, 3, Fdiv);
-		matDiv(m, n, F, Fdiv, F);
-		 
+	// F = (F1 + F2 + F3) / 3;
+	matAdd(m, n, F1, F2, F);
+	matAdd(m, n, F, F3, F);
+	float Fdiv[m][n];
+	ones(m, n, Fdiv);
+	matTimesScaler(m, n, Fdiv, 3, Fdiv);
+	matDiv(m, n, F, Fdiv, F);
+	
 } //end of function
 

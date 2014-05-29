@@ -1,34 +1,36 @@
 #include <stdio.h>
 
 /* creates a m*n tiling of a matrix */
-void repmat(float *in_matrix, int size1, int size2, int m, int n, float *out_matrix) {
+void repmat(int size1, int size2, float in_matrix[size1][size2], int m, int n, float out_matrix[size1*m][size2*n]) {
 	for(int i=0; i<size1*m; i++) {
 		for(int j=0; j<size2*n; j++) {
-			*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
+			//*(out_matrix + i*size2*n + j) = *(in_matrix + (i%size1)*size2 + (j%size2));
+			out_matrix[i][j] = in_matrix[i%size1][j%size2];
 		}
 	}
 }
 
+/* prints a matrix 
+ * matrix: pointer to the matrix to be printed
+ * size1 size2: size of matrix
+ */
+void printMatrix( int size1, int size2, float matrix[size1][size2]) {
+	for (int i=0; i<size1; i++){
+		for(int j=0; j<size2; j++) {
+			//printf("%.2f ", *(matrix + i*size2 + j));
+			printf("%.2f ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 int main() {
 	float a[3][2] = {{1.0,4.0},{2.0,5.0},{3.0,6.0}};
-	float *p = a;
-	for (int i=0; i<3; i++){
-		for(int j=0; j<2; j++) {
-			printf("%.2f ", *(p + i*2 + j));
-		}
-		printf("\n");
-	}
-	
-	printf("\n\n");
+	printMatrix(3,2,a);
 	float out_matrix[9][6];
-	repmat(a,3,2,3,3,out_matrix);
+	repmat(3,2,a,3,3,out_matrix);
+	printMatrix(9,6,out_matrix);
 	
-	for (int i=0; i<9; i++){
-		for(int j=0; j<6; j++) {
-			printf("%.2f ", out_matrix[i][j] );
-		}
-		printf("\n");
-	}
-
 }
 
