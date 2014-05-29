@@ -61,8 +61,8 @@ void pointDistort(int size, double G1[size][2], double G2[size][2], double cente
 	double distortionX;
 	double distortionY;
 	for(int i=0; i < size; i++){
-		distortionX = randomdouble();
-		distortionY = randomdouble();
+		distortionX = randomdouble()/10;
+		distortionY = randomdouble()/10;
 		G2[i][0] = distortionX + G1[i][0];
 		G2[i][1] = distortionY + G1[i][1];
 	}
@@ -72,7 +72,7 @@ void pointDistort(int size, double G1[size][2], double G2[size][2], double cente
 void graphDistortion(int size, double G1[size][2], double G2[size][2], double centerX, double centerY){
 
 	rotate(size, G1, G2, centerX, centerY);
-	//pointDistort(size, G2, G2, centerX, centerY);
+	pointDistort(size, G2, G2, centerX, centerY);
 
 } //end of function
 
@@ -163,10 +163,8 @@ void main(){
 	printMatrix(size, size, neighborDist2);
 
 	int size2;
-	if(size % 2 == 0)
-		size2 = (size*size)/2 - (size/2);
-	else
-		size2 = (size*size)/2 - (size/2);
+	size2 = (size*size)/2 - (size/2);
+
 
 	double simMatrix[size2][size2];
 	zeros(size2, size2, simMatrix);
@@ -174,5 +172,7 @@ void main(){
 	similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
 	printf("Similarity Scores\n");
 	printMatrix(size2, size2, simMatrix);
+
+
 
 }
