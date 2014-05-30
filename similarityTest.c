@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "graphMatching.c"
+#include "utils.c"
 
 #define PI 3.14159265
 
@@ -23,7 +25,7 @@ float randomfloatAngle(){
 
 	//scale to the 0 to 2PI range
 	r *= (2*PI);
-	
+
 	return r;
 } //end of function
 
@@ -69,17 +71,6 @@ void graphDistortion(int size, float G1[size][2], float G2[size][2], float cente
 
 } //end of function
 
-void printMatrix( int size1, int size2, float matrix[size1][size2]) {
-	for (int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++) {
-			//printf("%.2f ", *(matrix + i*size2 + j));
-			printf("%6.2f ", matrix[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-} //end of function
-
 //create a matrix of distances between nodes
 void neighborDistances(int size, float G1[size][2], float neighbors[size][size]){
 
@@ -118,18 +109,6 @@ void similarity(int size, int edges, float neighbors1[size][size], float neighbo
 
 }
 
-/* make Y an all zero matrix
- * size1 and size2 are the size of Y
- */
-void zeros(int size1, int size2, float Y[size1][size2]){
-	for(int i=0; i<size1; i++){
-		for(int j=0; j<size2; j++){
-			//*(Y + (i*size2 + j) ) = 0;
-			Y[i][j] = 0;
-		}
-	}
-}
-
 void main(){
 	int size = 5;
 	float G1[size][2];
@@ -148,7 +127,7 @@ void main(){
 	float neighborDist1[size][size], neighborDist2[size][size];
 	neighborDistances(size, G1, neighborDist1);
 	neighborDistances(size, G2, neighborDist2);
-	
+
 	printf("neighbor Distances 1\n");
 	printMatrix(size, size, neighborDist1);
 
@@ -165,6 +144,18 @@ void main(){
 	similarity(size, size2, neighborDist1, neighborDist2, simMatrix);
 	printf("Similarity Scores\n");
 	printMatrix(size2, size2, simMatrix);
+
+ 	float X[size][size];
+	float Z[size][size];
+	float Y[size][size];
+	graphMatching(size,neighborDist1,size,neighborDist2, 0.001, size,X,Z,Y);
+
+	printf("X(hard):\n");
+	printMatrix(size, size, X);
+	printf("Z(soft):\n");
+	printMatrix(size, size, Z);
+	printf("Y(debug):\n");
+	printMatrix(size, size, Y);
 
 
 

@@ -4,7 +4,7 @@
 #include "utils.c"
 #include "hypergraphMatching.c"
 
-void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2][size2], float sigma, int numberOfMatches, float X[size1][size2], float Z[size1][size2], float Y[size1][size2]){
+void graphMatching(int size1, float *G1, int size2, float* G2, float sigma, int numberOfMatches, float* X, float *Z, float* Y){
 
 /*	Algorithm due to R. Zass and A. Shashua.,
  	'Probabilistic Graph and Hypergraph Matching.',
@@ -37,12 +37,16 @@ void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2]
 	}
 
 	// tranpose G2
-	float G2t[size2][size2];
+	float *G2t = (float *)malloc(size2*size2*sizeof(float));
 	transpose(size2, size2, G2, G2t);
 	
 	// make Y an all zero matrix
 	zeros(size1, size2, Y);
-	float d[size1][size2], d1[size1][size2], d2[size1][size2], G1_i[size1][1], G2t_j[1][size2];
+	float* d = (float *)malloc(size1 * size2 * sizeof(float));
+	float* d1 = (float *)malloc(size1 * size2 * sizeof(float));
+	float* d2 = (float *)malloc(size1 * size2 * sizeof(float));
+	float* G1_i = (float *)malloc(size1 * sizeof(float));
+	float* G2t_j = (float *)malloc(size2 * sizeof(float));
 
 	for(int i=0; i < size1; i++) {
 		for(int j=0; j < size2; j++) {
@@ -65,19 +69,28 @@ void graphMatching(int size1, float G1[size1][size1], int size2, float G2[size2]
 			//exp((-d.*d) ./ sigma)
 			for(int k=0; k < size1; k++) {
 				for(int l=0; l < size2; l++) {
-					d[k][l] = exp((-d[k][l] * d[k][l]) / sigma);
+					*(d + k*size2 + l) = exp(-((*(d + k*size2 + l) * *(d + k*size2 + l)) / sigma));
 				}
 			}
 
 			// Y = Y + ...
 			for(int u=0; u < size1; u++) {
 				for(int v=0; v < size2; v++) {
-					Y[u][v] += d[u][v];
+					*(Y + u*size2 + v) += *(d + u*size2 + v);
 				}
 			}
 			
 		}
 	}
+
+	printMatrix(size1, size2, Y);
+
+	free(d);
+	free(d1);
+	free(d2);
+	free(G1_i);
+	free(G2t_j);
+	free(G2t);
 
 	/* do hypergraphMatching over Y */
 	hypergraphMatching(size1, size2, Y, numberOfMatches, X, Z);
