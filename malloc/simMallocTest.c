@@ -16,7 +16,7 @@
 #include "utils.c"
 
 #define PI 3.14159265
-#define TEST_SIZE 5
+#define TEST_SIZE 500
 
 //function returns a random float value in the interval [-1,1]
 float randomfloat(){
@@ -159,6 +159,8 @@ void makeAdjacency(int size, float* adjacent, int edges){
 
 void main(){
 
+	clock_t start = clock(), diff;
+
 	srand(time(0));
 
 //create random set of points
@@ -168,7 +170,7 @@ void main(){
 		*(G1 + i*2) = randomfloat();
 		*(G1 + i*2 + 1) = randomfloat();
 	}
-	printMatrix(size, 2, G1);
+//	printMatrix(size, 2, G1);
 
 //create adjacency matrix to determine where edges exist
 	float* adjacent = (float *)malloc(size*size*sizeof(float));
@@ -176,8 +178,8 @@ void main(){
 	int edges = size + (size/2);
 	makeAdjacency(size, adjacent, edges);
 
-	printf("Adjacency Matrix\n");
-	printMatrix(size, size, adjacent);
+//	printf("Adjacency Matrix\n");
+//	printMatrix(size, size, adjacent);
 
 
 //copy original set of points for distortion
@@ -189,35 +191,35 @@ void main(){
 
 //distort the graph for testing purposes
 	graphDistortion(size, G1, G2, 0, 0);
-	printMatrix(size, 2, G2);
+//	printMatrix(size, 2, G2);
 
 //calculate the distances to each neighbor
 	float *neighborDist1 = (float *) malloc(size*size*sizeof(float)); 
 	float *neighborDist2 = (float *) malloc(size*size*sizeof(float));
 	neighborDistances(size, G1, neighborDist1, adjacent);
 	neighborDistances(size, G2, neighborDist2, adjacent);
-	printf("neighbor Distances 1\n");
-	printMatrix(size, size, neighborDist1);
+//	printf("neighbor Distances 1\n");
+//	printMatrix(size, size, neighborDist1);
 
-	printf("neighbor distances 2\n");
-	printMatrix(size, size, neighborDist2);
+//	printf("neighbor distances 2\n");
+//	printMatrix(size, size, neighborDist2);
 
 	int size2;
 	size2 = (size*size)/2 - (size/2);
 
 	//printf("size2 is : %d\n", size2);
-	float *simMatrix = malloc(size2*size2 * sizeof(float));
-	int **simPtrs = malloc(size2 * sizeof(int));
+//	float *simMatrix = malloc(size2*size2 * sizeof(float));
+//	int **simPtrs = malloc(size2 * sizeof(int));
 //	printf("created simMatrix\n");
 //	zeros(size2, size2, simMatrix);
 
 //check to see if the graphs are the same
-	similarity(size, size2, edges, neighborDist1, neighborDist2, simMatrix);
+//	similarity(size, size2, edges, neighborDist1, neighborDist2, simMatrix);
 	//printf("Similarity Scores\n");
 	//printMatrix(size2, size2, simMatrix);
 
 //free up memory that was dynamically allocated
-	free(simMatrix);
+//	free(simMatrix);
 	free(G1);
 	free(G2);
 	free(adjacent);
@@ -225,22 +227,31 @@ void main(){
 	float *X = (float *)malloc(size*size*sizeof(float));
 	float *Z = (float *)malloc(size*size*sizeof(float));
 	float *Y = (float *)malloc(size*size*sizeof(float));
+	zeros(size, size, X);
+	zeros(size, size, Z);
+	zeros(size, size, Y);
 
 	printf("Got to graph matching\n");
-	graphMatching(size,neighborDist1,size,neighborDist2, 0.1,size,X,Z,Y);
+	graphMatching(size,neighborDist1,size,neighborDist2, 0.01,size,X,Z,Y);
+
+	printf("Finished\n");
 
 	free(neighborDist1);
 	free(neighborDist2);
 	  
-	printf("X(hard):\n");
+/*	printf("X(hard):\n");
 	printMatrix(size, size, X);
 	printf("Z(soft):\n");
 	printMatrix(size, size, Z);
 	printf("Y(debug):\n");
 	printMatrix(size, size, Y);
-
+*/
 	free(X);
 	free(Z);
 	free(Y);
+
+	diff = clock() - start;
+	int msec = diff * 1000 / CLOCKS_PER_SEC;
+	printf("Time taken %d seconds %d milliseconds\n", msec/1000, msec%1000);
 
 }

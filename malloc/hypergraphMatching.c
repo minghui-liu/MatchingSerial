@@ -41,28 +41,42 @@ void soft2hard(int size1, int size2, float* soft, int numberOfMatches, float* ha
 
 	for (int i=0; i<numberOfMatches; i++) {
 
+//		printf("i is now %d\n", i);
+//		printMatrix(size1, size2, softTemp);
+
 		maxOfMatrix(size1, size2, softTemp, maxSoft, 2);
-		
+
+//		printf("MaxSoft is\n");
+//		printMatrix(size1, 1, maxSoft);
+
 		// dummy is the max element in maxSoft, r is its position in maxSoft
 		float dummy = *(maxSoft);
 		for (int i=0; i<size1; i++) {
 			dummy = (dummy > *(maxSoft + i))? dummy : *(maxSoft + i);
 		}
-
 		int r = indexOfElement(size1, maxSoft, dummy);
+
+//		printf("Dummy is %f and r is %d\n", dummy, r);
 		
 		// val is the max of soft(r,:), c is the index of val in soft(r,:)
-		
+
+//		printf("maxSoft 2 is\n");
+//		printMatrix(size1, 1, maxSoft);
+	
 		getRow(size1,size2,softTemp,softR,r);
-		
+
+//		printf("softR\n");
+//		printMatrix(size1, 1, softR);
 		float val = *(softR);
 		for (int i=0; i<size2; i++) {
 			val = (val > *(softR + i))? val : *(softR + i);
 		}
 		int c = indexOfElement(size2, softR,val);
-		
-		if (val < 0)
+//		printf("val is now %.2f\n", val);
+		if (val < 0){
+//			printf("I'm returning now\n");
 			return;
+		}
 		*(hard+r*size2+c) = 1;
 		//hard[r][c] = 1;
 		// soft(r,:) = -inf;
@@ -72,7 +86,7 @@ void soft2hard(int size1, int size2, float* soft, int numberOfMatches, float* ha
 		}
 		// soft(:,c) = -inf;
 		for (int k=0; k<size1; k++) {
-			*(softTemp+c*size2+k) = -INFINITY;
+			*(softTemp+k*size2+c) = -INFINITY;
 			//softTemp[k][c] = -INFINITY;
 		}
 		

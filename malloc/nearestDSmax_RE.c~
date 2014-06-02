@@ -31,6 +31,13 @@ Author: Ron Zass, zass@cs.huji.ac.il, www.cs.huji.ac.il/~zass
 //function x = exactTotalSum (y, h, totalSum, precision)
 void exactTotalSum(int length, float* y, float* h, float totalSum, float precision, float* X) {
 
+/*	printf("X inside exactTotalSum\n");
+	printMatrix(length, 1, X);
+	printf("y inside exactTotalSum\n");
+	printMatrix(length, 1, y);
+	printf("h inside exactTotalSum\n");
+	printMatrix(length, 1, h);
+*/
 	// y and h are vectors, totalSum and precision are scalars
 	//X is the return vector and length is the length of y, h, and X
 	float totalSumMinus = totalSum - precision;
@@ -74,6 +81,13 @@ void exactTotalSum(int length, float* y, float* h, float totalSum, float precisi
 } //end of function
 
 void unconstrainedP(int size1, int size2, float* Y, float* H, float* X){
+
+/*
+	printf("Y is\n");
+	printMatrix(size1, size2, Y);
+	printf("H is\n");
+	printMatrix(size1, size2, H);
+*/
 	//function X = unconstrainedP (Y, H)
 	for(int i=0; i<size1; i++) {
 		for(int j=0; j<size2; j++) {
@@ -81,12 +95,19 @@ void unconstrainedP(int size1, int size2, float* Y, float* H, float* X){
 			*(X + i*size2 + j) = *(Y + i*size2 + j) / *(H + i*size2 + j);
 
 			//X(find(X < eps)) = eps;
-			if(*(X + i*size2 + j) < EPS) {
+			if(fabs(*(X + i*size2 + j)) < EPS) {
 				*(X + i*size2 + j) = EPS;
 			}
 
 		} // end of for j
 	} // end of for i
+/*
+	printf("Y is now\n");
+	printMatrix(size1, size2, Y);
+	printf("H is now\n");
+	printMatrix(size1, size2, H);
+*/
+
 } // end of function
 
 
@@ -94,8 +115,15 @@ void unconstrainedP(int size1, int size2, float* Y, float* H, float* X){
 //function X = maxColSumP (Y, H, maxColSum, precision)
 void maxColSumP(int dim1, int dim2, float* Y, float* H, float* maxColSum, float precision, float* X) {
 	//X = unconstrainedP (Y, H);
+
+//	printf("X before unconstrained is\n");
+//	printMatrix(dim1, dim2, X);
+
 	unconstrainedP(dim1, dim2, Y, H, X);
-	
+
+//	printf("X after unconstrained is\n");
+//	printMatrix(dim1, dim2, X);
+
 	//Xsum = sum(X);
 	float* Xsum = (float *) malloc(dim2 * sizeof(float));
 	for(int i=0; i < dim2; i++){
@@ -109,6 +137,8 @@ void maxColSumP(int dim1, int dim2, float* Y, float* H, float* maxColSum, float 
 	float* Xcol = (float *)malloc(dim1 * sizeof(float));
 	//float dim = dim1*dim2;	
 
+//	printf("X before exactTotalSum is\n");
+//	printMatrix(dim1, dim2, X);
 
 	//for i = find(Xsum > maxColSum)
 	for(int i=0; i < dim2; i++) {
@@ -119,6 +149,10 @@ void maxColSumP(int dim1, int dim2, float* Y, float* H, float* maxColSum, float 
 			getCol(dim1, dim2, H, hCol, i);
 
 			exactTotalSum(dim1, yCol, hCol, *(maxColSum + i), precision, Xcol);
+//			printf("Xcol is\n");
+//			printMatrix(dim1, 1, Xcol);
+//			printf("X after exactTotalSum in maxColSumP\n");
+//			printMatrix(dim1, dim2, X);
 			
 			for(int j=0; j < dim1; j++){
 				*(X + j*dim1 + i) = *(Xcol + j);
@@ -126,6 +160,10 @@ void maxColSumP(int dim1, int dim2, float* Y, float* H, float* maxColSum, float 
 
 		}
 	}
+
+//	printf("X after exactTotalSum is\n");
+//	printMatrix(dim1, dim2, X);
+
 	free(yCol);
 	free(hCol);
 	free(Xcol);
@@ -151,6 +189,14 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 	zeros(m, n, lambda1);
 	zeros(m, n, lambda2);
 	zeros(m, n, lambda3);
+		
+/*	printf("lambda1\n");
+	printMatrix(m, n, lambda1);
+	printf("lambda2\n");
+	printMatrix(m, n, lambda2);
+	printf("lambda3\n");
+	printMatrix(m, n, lambda3);
+*/		
 
 /*    
  *	F1 = totalSum * (Y ./ sum(Y(:)));
@@ -179,13 +225,13 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 
 		}
 	}
-	printf("F1\n");
+/*	printf("F1\n");
 	printMatrix(m, n, F1);
 	printf("F2\n");
 	printMatrix(m, n, F2);
 	printf("F3\n");
 	printMatrix(m, n, F3);
-
+*/
 	float* H1 = (float *) malloc(m*n*sizeof(float));
 	float* H2 = (float *) malloc(m*n*sizeof(float));
 	float* H3 = (float *) malloc(m*n*sizeof(float));
@@ -211,9 +257,9 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 	float* Fdiff2 = (float *) malloc(m*n*sizeof(float));
 
 //for t = 1 : maxLoops
-	for(int t=0; t < maxLoops; t++) {
+	for(int t=0; t < 10; t++) {
 
-		if(t < 10){
+/*		if(t < 3){
 			printf("t is now %d\n", t);
 			printf("F1\n");
 			printMatrix(m, n, F1);
@@ -222,38 +268,70 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 			printf("F3\n");
 			printMatrix(m, n, F3);
 		} 
-
+*/
 // Max row sum 
 		// H1 = lambda1 - (Y ./ (F3+eps));
 		
 		matPlusScaler(m, n, F3, EPS, F3eps);
 		matDiv(m, n, Y, F3eps, YdivF3eps);
 		matSub(m, n, lambda1, YdivF3eps, H1);
-		
+
+/*		if(t < 3){
+			printf("H1 is\n");
+			printMatrix(m, n, H1);
+		}
+
+		if(t < 3){
+			printf("F1 before maxColSumP is now\n");
+			printMatrix(m, n, F1);
+		}
+*/		
 		// F1 = maxColSumP (Y', -H1', maxRowSum', precision)';
 		//-H1'
-		
 		transpose(m, n, H1, H1t);
 		matTimesScaler(n, m, H1t, -1, negH1t);
 		//Y'
 		transpose(m, n, Y, Yt);
-		//maxRowSum'
-		
+		//maxRowSum'	
 		transpose(m, 1, maxRowSum, maxRowSumT);
 		//maxColSumP (Y', -H1', maxRowSum', precision)'
-		maxColSumP(n, m, Yt, negH1t, maxRowSumT, precision, F1t);
+		maxColSumP(n, m, Yt, negH1t, maxRowSumT, EPS, F1t);
 		//F1
 		transpose(n,m,F1t,F1);
+
+/*		if(t < 3){
+			printf("Yt\n");
+			printMatrix(m, n, Yt);
+			printf("negH1t\n");
+			printMatrix(n, m, negH1t);
+			printf("maxRowSumT\n");
+			printMatrix(m, 1, maxRowSumT);
+			printf("F1t is now \n");
+			printMatrix(n, m, F1t);
+			printf("F1 after maxColSumP is now\n");
+			printMatrix(m, n, F1);
+		}
+*/
 		// lambda1 = lambda1 - (Y ./ (F3+eps)) + (Y ./ (F1+eps));
 		matPlusScaler(m, n, F1, EPS, F1eps);
 		matDiv(m, n, Y, F1eps, YdivF1eps);
 		matSub(m, n, lambda1, YdivF3eps, lambda1);
 		matAdd(m, n, lambda1, YdivF1eps, lambda1);
-
+/*		if(t < 3){
+			printf("F1\n");
+			printMatrix(m, n, F1);
+			printf("YdivF3eps\n");
+			printMatrix(m, n, YdivF3eps);
+			printf("YdivF1eps\n");
+			printMatrix(m, n, YdivF1eps);
+			printf("lambda1\n");
+			printMatrix(m, n, lambda1);
+		}
+*/
 // Max col sum 
 		// H2 = lambda2 - (Y ./ (F1+eps));
 		matPlusScaler( m, n, F1, EPS, F1eps);
-		matDiv(m, n, Y, F1eps, YdivF1eps);
+//		matDiv(m, n, Y, F1eps, YdivF1eps);
 		matSub(m, n, lambda2, YdivF1eps, H2);
 
 		// F2 = maxColSumP (Y, -H2, maxColSum, precision);	
@@ -275,7 +353,7 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 		for(int i=0; i<n; i++){ 
 			for(int j=0; j < m; j++){
 				*(Yv + i*m + j) = *(Y + j*n + i);
-				*(negH3 + n*i + j) = -*(H3 + j*n + i);
+				*(negH3 + m*i + j) = -(*(H3 + j*n + i));
 			}
 		}
 
@@ -294,7 +372,16 @@ void nearestDSmax_RE(int m, int n, float* Y, float* maxRowSum, float* maxColSum,
 		matDiv(m, n, Y, F3eps, YdivF3eps);
 		matSub(m, n, lambda3, YdivF2eps, lambda3);
 		matAdd(m, n, lambda3, YdivF3eps, lambda3);	
-		
+
+/*		if(t < 3){
+			printf("lambda1\n");
+			printMatrix(m, n, lambda1);
+			printf("lambda2\n");
+			printMatrix(m, n, lambda2);
+			printf("lambda3\n");
+			printMatrix(m, n, lambda3);
+		}
+*/	
 		//if (max(abs(F1(:) - F2(:))) < precision && max(abs(F1(:) - F3(:))) < precision)
 
 		for(int i=0; i < m; i++){

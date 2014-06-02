@@ -83,8 +83,6 @@ void graphMatching(int size1, float *G1, int size2, float* G2, float sigma, int 
 		}
 	}
 
-	printMatrix(size1, size2, Y);
-
 	free(d);
 	free(d1);
 	free(d2);
@@ -94,5 +92,7 @@ void graphMatching(int size1, float *G1, int size2, float* G2, float sigma, int 
 
 	/* do hypergraphMatching over Y */
 	hypergraphMatching(size1, size2, Y, numberOfMatches, X, Z);
+
+	printMatrix(size1, size2, Z);
 
 }
